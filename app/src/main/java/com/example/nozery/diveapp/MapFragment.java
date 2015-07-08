@@ -4,9 +4,13 @@ import android.app.Activity;
 import android.net.Uri;
 import android.os.Bundle;
 import android.app.Fragment;
+import android.app.ActionBar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 
 
 /**
@@ -58,12 +62,19 @@ public class MapFragment extends Fragment {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
+
+
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
+
+        // Set title bar
+        ((MainActivity) getActivity())
+                .setActionBarTitle("Map");
+        setHasOptionsMenu(true);
         return inflater.inflate(R.layout.fragment_map, container, false);
     }
 
@@ -101,9 +112,28 @@ public class MapFragment extends Fragment {
      * "http://developer.android.com/training/basics/fragments/communicating.html"
      * >Communicating with Other Fragments</a> for more information.
      */
-    public interface OnMapInteractionListener {
+    interface OnMapInteractionListener {
         // TODO: Update argument type and name
-        public void onMapInteraction(Uri uri);
+        void onMapInteraction(Uri uri);
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        // TODO Auto-generated method stub
+        super.onCreateOptionsMenu(menu, inflater);
+        inflater.inflate(R.menu.map_activity_actions, menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // handle item selection
+        switch (item.getItemId()) {
+            case R.id.action_settings:
+                // do s.th.
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 
 }

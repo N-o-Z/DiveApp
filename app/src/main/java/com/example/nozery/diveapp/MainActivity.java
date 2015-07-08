@@ -2,15 +2,15 @@ package com.example.nozery.diveapp;
 
 import android.app.FragmentManager;
 import android.net.Uri;
-import android.support.v4.app.Fragment;
 import android.os.Bundle;
+import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.support.v4.app.FragmentActivity;
 import android.view.View;
 import android.widget.Button;
+import android.app.ActionBar;
 
-public class MainActivity extends FragmentActivity implements
+public class MainActivity extends ActionBarActivity implements
         MapFragment.OnMapInteractionListener, BoardFragment.OnBoardInteractionListener,
         SearchFragment.OnSearchInteractionListener, ProfileFragment.OnProfileInteractionListener {
 
@@ -25,6 +25,10 @@ public class MainActivity extends FragmentActivity implements
     private static ProfileFragment mProfileFragment;
 
     private FragmentManager mManager;
+
+    public void setActionBarTitle(String title) {
+        getSupportActionBar().setTitle(title);
+    }
 
     private void switchToFragment(android.app.Fragment frag) {
         mManager.beginTransaction()
@@ -48,7 +52,6 @@ public class MainActivity extends FragmentActivity implements
         mProfileFragment = ProfileFragment.newInstance("a","b");
 
         switchToFragment(mMapFragment);
-        //mManager.beginTransaction().add(R.id.fragment_container, mMapFragment);
 
         //Initializing buttons and listeners
         mMapButton = (Button) findViewById(R.id.btn_main_map);

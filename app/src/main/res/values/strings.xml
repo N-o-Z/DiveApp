@@ -7,6 +7,7 @@
     <string name="main_board">Board</string>
     <string name="main_search">Search</string>
     <string name="main_profile">Profile</string>
+    <string name="action_search">Search</string>
 
 <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_map_fragment">Hello map fragment</string>

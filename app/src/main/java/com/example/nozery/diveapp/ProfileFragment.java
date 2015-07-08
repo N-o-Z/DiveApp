@@ -63,6 +63,10 @@ public class ProfileFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        // Set title bar
+        ((MainActivity) getActivity())
+                .setActionBarTitle("Profile");
+        setHasOptionsMenu(true);
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_profile, container, false);
     }
@@ -101,9 +105,9 @@ public class ProfileFragment extends Fragment {
      * "http://developer.android.com/training/basics/fragments/communicating.html"
      * >Communicating with Other Fragments</a> for more information.
      */
-    public interface OnProfileInteractionListener {
+    interface OnProfileInteractionListener {
         // TODO: Update argument type and name
-        public void onProfileInteraction(Uri uri);
+        void onProfileInteraction(Uri uri);
     }
 
 }

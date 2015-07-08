@@ -63,6 +63,11 @@ public class SearchFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        // Set title bar
+        ((MainActivity) getActivity())
+                .setActionBarTitle("Search");
+        setHasOptionsMenu(true);
+
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_search, container, false);
     }
@@ -103,7 +108,7 @@ public class SearchFragment extends Fragment {
      */
     public interface OnSearchInteractionListener {
         // TODO: Update argument type and name
-        public void onSearchInteraction(Uri uri);
+        void onSearchInteraction(Uri uri);
     }
 
 }

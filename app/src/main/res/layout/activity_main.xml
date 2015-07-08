@@ -9,35 +9,40 @@
         android:layout_width="match_parent" android:layout_height="wrap_content"
         android:orientation="vertical">
 
-        <TextView  android:id="@+id/hello_world" android:text="@string/hello_world"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
-
         <LinearLayout android:id="@+id/fragment_container" android:orientation="horizontal"
             android:layout_width="match_parent" android:layout_height="fill_parent"
-            android:layout_below="@+id/hello_world" android:layout_above="@+id/bottom_bar">
-
+            android:layout_alignParentTop="true">
         </LinearLayout>
 
         <LinearLayout android:id="@+id/bottom_bar"
+            android:background="@drawable/drk_blue_bottom_bar"
             android:layout_width="match_parent" android:layout_height="wrap_content"
             android:orientation="horizontal" android:layout_alignParentBottom="true"
             android:weightSum="4">
 
-            <Button android:id="@+id/btn_main_map" style="?android:textAppearanceSmall"
+            <Button android:id="@+id/btn_main_map" style="@style/button_text"
+                android:background="@drawable/drk_blue_button"
                 android:layout_width="match_parent" android:layout_height="match_parent"
                 android:layout_weight="1" android:text="@string/main_map" />
 
-            <Button android:id="@+id/btn_main_board"
-                style="?android:textAppearanceSmall" android:layout_width="match_parent"
+            <View style="@style/vertical_separator"/>
+
+            <Button android:id="@+id/btn_main_board" style="@style/button_text"
+                android:background="@drawable/drk_blue_button" android:layout_width="match_parent"
                 android:layout_height="match_parent" android:layout_weight="1"
                 android:text="@string/main_board" />
-            <Button android:id="@+id/btn_main_search" style="?android:textAppearanceSmall"
+
+            <View style="@style/vertical_separator"/>
+
+            <Button android:id="@+id/btn_main_search" style="@style/button_text"
+                android:background="@drawable/drk_blue_button"
                 android:layout_width="match_parent" android:layout_height="match_parent"
                 android:layout_weight="1" android:text="@string/main_search" />
 
-            <Button android:id="@+id/btn_main_profile"
-                style="?android:textAppearanceSmall" android:layout_width="match_parent"
+            <View style="@style/vertical_separator"/>
+
+            <Button android:id="@+id/btn_main_profile" style="@style/button_text"
+                android:background="@drawable/drk_blue_button" android:layout_width="match_parent"
                 android:layout_height="match_parent" android:layout_weight="1"
                 android:text="@string/main_profile" />
 

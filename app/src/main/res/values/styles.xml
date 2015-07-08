@@ -4,5 +4,24 @@
     <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
         <!-- Customize your theme here. -->
     </style>
-
+    <style name="button_text" >
+        <item name="android:layout_width" >fill_parent</item>
+        <item name="android:layout_height" >wrap_content</item>
+        <item name="android:textColor" >#b4b4b4</item>
+        <item name="android:gravity" >center</item>
+        <item name="android:layout_margin" >1dp</item>
+        <item name="android:textSize" >15dp</item>
+        <item name="android:textStyle" >bold</item>
+        <item name="android:shadowColor" >#000000</item>
+        <item name="android:shadowDx" >1</item>
+        <item name="android:shadowDy" >1</item>
+        <item name="android:shadowRadius" >2</item>
+    </style>
+    <style name="vertical_separator" >
+        <item name="android:layout_height" >40dp</item>
+        <item name="android:layout_width" >2dp</item>
+        <item name="android:background" >#90909090</item>
+        <item name="android:layout_marginBottom" >5dp</item>
+        <item name="android:layout_marginTop" >5dp</item>
+    </style>
 </resources>

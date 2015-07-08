@@ -63,6 +63,11 @@ public class BoardFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        // Set title bar
+        ((MainActivity) getActivity())
+                .setActionBarTitle("Board");
+        setHasOptionsMenu(true);
+
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_board, container, false);
     }
@@ -101,9 +106,9 @@ public class BoardFragment extends Fragment {
      * "http://developer.android.com/training/basics/fragments/communicating.html"
      * >Communicating with Other Fragments</a> for more information.
      */
-    public interface OnBoardInteractionListener {
+    interface OnBoardInteractionListener {
         // TODO: Update argument type and name
-        public void onBoardInteraction(Uri uri);
+        void onBoardInteraction(Uri uri);
     }
 
 }
