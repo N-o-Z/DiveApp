@@ -2,12 +2,6 @@
     xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
     android:layout_height="match_parent" tools:context="com.example.nozery.diveapp.MapFragment">
 
-    <RelativeLayout android:id="@+id/top_bar"
-        android:background="@drawable/drk_blue_bottom_bar"
-        android:layout_width="match_parent" android:layout_height="wrap_content"
-        android:orientation="horizontal" android:layout_alignParentTop="true">
-
-    </RelativeLayout>
     <!-- TODO: Update blank fragment layout -->
     <TextView android:layout_width="match_parent" android:layout_height="match_parent"
         android:text="@string/hello_map_fragment" />
