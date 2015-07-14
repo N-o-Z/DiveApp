@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">DiveApp</string>
+    <string name="app_name">\'DiveApp\'</string>
 
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
@@ -8,6 +8,41 @@
     <string name="main_search">Search</string>
     <string name="main_profile">Profile</string>
     <string name="action_search">Search</string>
+    <string name="action_add">Add Post</string>
+
+<!-- profile fragment texts -->
+    <string name="account_info_title">Account Info</string>
+    <string name="username_text">Username</string>
+    <string name="username_hint">name</string>
+    <string name="username_item">USERNAME</string>
+    <string name="email_hint">Email</string>
+    <string name="email_item">EMAIL@PROVIDER.COM</string>
+    <string name="personal_info_title">Personal Info</string>
+    <string name="name_hint">Full name</string>
+    <string name="name_item">John Doe</string>
+    <string name="gender_hint">Gender</string>
+    <string name="gender_item">@string/not_specified</string>
+    <string name="gender_male">Male</string>
+    <string name="gender_female">Female</string>
+    <string name="birthday_hint">BirthDay</string>
+    <string name="birthday_item">@string/not_specified</string>
+    <string name="language_hint">Language</string>
+    <string name="language_item">English</string>
+    <string name="country_hint">Country</string>
+    <string name="country_item">@string/not_specified</string>
+    <string name="diver_info_title">Diver Info</string>
+    <string name="certification_hint">Diver Certification</string>
+    <string name="organization_hint">Organization</string>
+    <string name="additional_cert_hint">Additional Certifications</string>
+    <string name="not_specified">Not Specified</string>
+    <string name="ok">OK</string>
+
+    <!-- Board fragment profile values texts -->
+    <string name="age_hint">Age</string>
+    <string name="age_item">@string/not_specified</string>
+    <string name="description_zoom_touch_close">Touch to close</string>
+    <!-- DB values texts -->
+    <string name="user_entry">user entry</string>
 
 <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_map_fragment">Hello map fragment</string>

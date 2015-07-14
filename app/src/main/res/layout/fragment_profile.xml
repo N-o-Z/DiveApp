@@ -1,9 +1,311 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
-    android:layout_height="match_parent" tools:context="com.example.nozery.diveapp.ProfileFragment">
+    android:layout_height="match_parent" tools:context="com.example.nozery.diveapp.ProfileFragment"
+    android:background="@drawable/fragment_background"
+    android:id="@+id/container">
 
-    <!-- TODO: Update blank fragment layout -->
-    <TextView android:layout_width="match_parent" android:layout_height="match_parent"
-        android:text="@string/hello_profile_fragment" />
+    <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/profile_scroll_view" style="@style/basic_page_layout"
+        android:layout_height="match_parent" android:layout_width="match_parent">
 
+        <LinearLayout
+            android:orientation="vertical" android:layout_height="match_parent"
+            android:layout_width="match_parent" android:background="#0000">
+
+            <RelativeLayout
+                android:orientation="vertical" android:layout_width="wrap_content"
+                android:layout_height="wrap_content" android:id="@+id/account_info">
+
+                <LinearLayout
+                    style="@style/basic_frame_layout" android:orientation="vertical"
+                    android:id="@+id/account_info_title">
+
+                    <TextView
+                        style="@style/headline_text"
+                        android:text="@string/account_info_title"
+                        android:layout_height="wrap_content"
+                        android:layout_width="wrap_content"
+                        android:id="@+id/accountTitle"/>
+
+                    <View style="@style/horizontal_separator"
+                        android:id="@+id/account_separator"/>
+
+                </LinearLayout>
+
+                <ImageView
+                    android:background="@drawable/image_border"
+                    android:id="@+id/profile_picture"
+                    android:layout_gravity="right"
+                    android:layout_weight="0"
+                    android:layout_marginRight="@dimen/basic_content_margin_horizontal"
+                    android:layout_height="@dimen/profile_picture_small_height"
+                    android:layout_width="@dimen/profile_picture_small_width"
+                    android:scaleType="fitXY"
+                    android:layout_below="@id/account_info_title"
+                    android:layout_alignParentRight="true">
+                </ImageView>
+
+                <LinearLayout
+                    style="@style/basic_frame_layout"
+                    android:id="@+id/account_info_username" android:orientation="vertical"
+                    android:layout_below="@id/account_info_title">
+
+                    <LinearLayout
+                         android:orientation="horizontal" android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@id/account_info_title">
+
+                        <TextView
+                            style="@style/hint_text"
+                            android:text="@string/app_name"
+                            android:layout_height="wrap_content"
+                            android:layout_width="wrap_content"
+                            android:id="@+id/usernameHint1"/>
+
+                        <TextView
+                            style="@style/hint_text"
+                            android:text="@string/username_hint"
+                            android:layout_height="wrap_content"
+                            android:layout_width="wrap_content"
+                            android:id="@+id/usernameHint2"
+                            android:layout_marginLeft="2dp"/>
+
+                    </LinearLayout>
+
+                    <TextView
+                        style="@style/item_text"
+                        android:layout_height="wrap_content"
+                        android:layout_width="wrap_content"
+                        android:id="@+id/account_username_text"/>
+
+                </LinearLayout>
+
+                <LinearLayout
+                    style="@style/basic_frame_layout"
+                    android:id="@+id/account_info_email" android:orientation="vertical"
+                    android:layout_below="@id/account_info_username">
+
+                    <TextView
+                        style="@style/hint_text"
+                        android:text="@string/email_hint"
+                        android:layout_height="wrap_content"
+                        android:layout_width="wrap_content"
+                        android:id="@+id/email_hint"/>
+
+                    <TextView
+                        style="@style/item_text"
+                        android:layout_height="wrap_content"
+                        android:layout_width="wrap_content"
+                        android:id="@+id/account_email_text"/>
+                </LinearLayout>
+            </RelativeLayout>
+
+            <LinearLayout
+                android:id="@+id/personal_info" android:orientation="vertical"
+                android:layout_width="wrap_content" android:layout_height="wrap_content">
+
+                <LinearLayout style="@style/basic_frame_layout"
+                    android:orientation="vertical" android:id="@+id/personal_info_title">
+
+                    <TextView
+                        style="@style/headline_text"
+                        android:text="@string/personal_info_title"
+                        android:layout_height="wrap_content"
+                        android:layout_width="wrap_content"
+                        android:id="@+id/personalTitle"/>
+
+                    <View style="@style/horizontal_separator"
+                        android:id="@+id/personal_separator"/>
+                </LinearLayout>
+
+                <LinearLayout
+                    style="@style/basic_frame_layout" android:layout_width="match_parent"
+                    android:id="@+id/personal_info_name" android:orientation="vertical">
+
+                    <TextView
+                        style="@style/hint_text"
+                        android:text="@string/name_hint"
+                        android:layout_height="wrap_content"
+                        android:layout_width="wrap_content"
+                        android:id="@+id/name_hint"/>
+
+                    <TextView
+                        style="@style/item_text"
+                        android:layout_height="wrap_content"
+                        android:layout_width="match_parent"
+                        android:id="@+id/profile_name_text"/>
+
+                </LinearLayout>
+
+                <LinearLayout
+                    style="@style/basic_frame_layout" android:layout_width="match_parent"
+                    android:id="@+id/personal_info_gender" android:orientation="vertical">
+
+                    <TextView
+                        style="@style/hint_text"
+                        android:text="@string/gender_hint"
+                        android:layout_height="wrap_content"
+                        android:layout_width="wrap_content"
+                        android:id="@+id/gender_hint"/>
+
+                    <TextView
+                        style="@style/item_text"
+                        android:layout_height="wrap_content"
+                        android:layout_width="match_parent"
+                        android:id="@+id/profile_gender_text"/>
+
+                </LinearLayout>
+
+                <LinearLayout
+                    style="@style/basic_frame_layout" android:layout_width="match_parent"
+                    android:id="@+id/personal_info_birthday" android:orientation="vertical">
+
+                    <TextView
+                        style="@style/hint_text"
+                        android:text="@string/birthday_hint"
+                        android:layout_height="wrap_content"
+                        android:layout_width="wrap_content"
+                        android:id="@+id/birthday_hint"/>
+
+                    <TextView
+                        style="@style/item_text"
+                        android:layout_height="wrap_content"
+                        android:layout_width="match_parent"
+                        android:id="@+id/profile_birthday_text"/>
+
+                </LinearLayout>
+
+                <LinearLayout
+                    style="@style/basic_frame_layout" android:layout_width="match_parent"
+                    android:id="@+id/personal_info_language" android:orientation="vertical">
+
+                    <TextView
+                        style="@style/hint_text"
+                        android:text="@string/language_hint"
+                        android:layout_height="wrap_content"
+                        android:layout_width="wrap_content"
+                        android:id="@+id/language_hint"/>
+
+                    <TextView
+                        style="@style/item_text"
+                        android:layout_height="wrap_content"
+                        android:layout_width="match_parent"
+                        android:id="@+id/profile_language_text"/>
+
+                </LinearLayout>
+
+                <LinearLayout
+                    style="@style/basic_frame_layout" android:layout_width="match_parent"
+                    android:id="@+id/personal_info_country" android:orientation="vertical">
+
+                    <TextView
+                        style="@style/hint_text"
+                        android:text="@string/country_hint"
+                        android:layout_height="wrap_content"
+                        android:layout_width="wrap_content"
+                        android:id="@+id/country_hint"/>
+
+                    <TextView
+                        style="@style/item_text"
+                        android:layout_height="wrap_content"
+                        android:layout_width="match_parent"
+                        android:id="@+id/profile_country_text"/>
+
+                </LinearLayout>
+            </LinearLayout>
+
+            <LinearLayout
+                android:orientation="vertical" android:layout_width="wrap_content"
+                android:layout_height="wrap_content" android:id="@+id/diver_info">
+
+                <LinearLayout
+                    style="@style/basic_frame_layout"
+                    android:orientation="vertical" android:id="@+id/diver_info_title">
+                    <TextView
+                        style="@style/headline_text"
+                        android:text="@string/diver_info_title"
+                        android:layout_height="wrap_content"
+                        android:layout_width="wrap_content"
+                        android:id="@+id/diver_title"/>
+
+                    <View style="@style/horizontal_separator"
+                        android:id="@+id/diver_separator"/>
+
+                </LinearLayout>
+
+                <LinearLayout
+                    style="@style/basic_frame_layout" android:layout_width="match_parent"
+                    android:id="@+id/diver_info_certification" android:orientation="vertical">
+
+                    <TextView
+                        style="@style/hint_text"
+                        android:text="@string/certification_hint"
+                        android:layout_height="wrap_content"
+                        android:layout_width="wrap_content"
+                        android:id="@+id/certification_hint"/>
+
+                    <TextView
+                        style="@style/item_text"
+                        android:layout_height="wrap_content"
+                        android:layout_width="match_parent"
+                        android:id="@+id/profile_certification_text"/>
+
+                </LinearLayout>
+
+                <LinearLayout
+                    style="@style/basic_frame_layout" android:layout_width="match_parent"
+                    android:id="@+id/diver_info_organization" android:orientation="vertical">
+
+                    <TextView
+                        style="@style/hint_text"
+                        android:text="@string/organization_hint"
+                        android:layout_height="wrap_content"
+                        android:layout_width="wrap_content"
+                        android:id="@+id/organization_hint"/>
+
+                    <TextView
+                        style="@style/item_text"
+                        android:layout_height="wrap_content"
+                        android:layout_width="match_parent"
+                        android:id="@+id/profile_organization_text"/>
+
+                </LinearLayout>
+
+                <LinearLayout
+                    style="@style/basic_frame_layout" android:layout_width="match_parent"
+                    android:id="@+id/diver_info_added_cert" android:orientation="vertical">
+
+                    <TextView
+                        style="@style/hint_text"
+                        android:text="@string/additional_cert_hint"
+                        android:layout_height="wrap_content"
+                        android:layout_width="wrap_content"
+                        android:id="@+id/added_cert_hint"/>
+
+                    <TextView
+                        style="@style/item_text"
+                        android:layout_height="wrap_content"
+                        android:layout_width="match_parent"
+                        android:id="@+id/profile_additional_cert_text"/>
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+        </LinearLayout>
+    </ScrollView>
+
+    <RelativeLayout
+        android:id="@+id/expanded_image_container"
+        android:layout_width="match_parent" android:layout_height="match_parent"
+        android:visibility="invisible">
+        <ImageView
+            style="@style/button_text"
+            android:id="@+id/expanded_image"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:padding="50dp"
+            android:src="@drawable/profile" android:layout_centerInParent="true"
+            android:contentDescription="@string/description_zoom_touch_close" />
+    </RelativeLayout>
 </FrameLayout>

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array
+        name="string_array_scuba_orgs">
+        <item>@string/not_specified</item>
+        <item>PADI</item>
+        <item>CMAS</item>
+        <item>SSI</item>
+        <item>TDI</item>
+        <item>BSAC</item>
+        <item>NAUI</item>
+        <item>SDI</item>
+    </string-array>
+</resources>
