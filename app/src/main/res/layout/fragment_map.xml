@@ -1,10 +1,16 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
-    android:layout_height="match_parent" tools:context="com.example.nozery.diveapp.MapFragment"
+    android:layout_height="match_parent" tools:context="com.example.nozery.diveapp.DiveMapFragment"
     android:background="@drawable/fragment_background">
 
     <!-- TODO: Update blank fragment layout -->
     <TextView android:layout_width="match_parent" android:layout_height="match_parent"
         android:text="@string/hello_map_fragment" />
+
+    <fragment xmlns:android="http://schemas.android.com/apk/res/android"
+        android:name="com.google.android.gms.maps.MapFragment"
+        android:id="@+id/diveMap"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
 
 </FrameLayout>

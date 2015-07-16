@@ -1,11 +1,11 @@
 package com.example.nozery.diveapp;
 
 import android.app.Activity;
+import android.app.Fragment;
 import android.content.Context;
 import android.database.DataSetObserver;
 import android.net.Uri;
 import android.os.Bundle;
-import android.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -13,11 +13,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-
-//List imports
-import java.util.ArrayList;
-import java.util.List;
-
 import android.widget.BaseExpandableListAdapter;
 import android.widget.Button;
 import android.widget.ExpandableListView;
@@ -28,13 +23,18 @@ import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
 
+import java.util.ArrayList;
+import java.util.List;
+
+//List imports
+
 
 /**
  * A simple {@link Fragment} subclass.
  * Activities that contain this fragment must implement the
  * {@link BoardFragment.OnBoardInteractionListener} interface
  * to handle interaction events.
- * Use the {@link MapFragment#newInstance} factory method to
+ * Use the {@link DiveMapFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
 public class BoardFragment extends Fragment {
@@ -57,7 +57,7 @@ public class BoardFragment extends Fragment {
      *
      * @param param1 Parameter 1.
      * @param param2 Parameter 2.
-     * @return A new instance of fragment MapFragment.
+     * @return A new instance of fragment DiveMapFragment.
      */
     // TODO: Rename and change types and number of parameters
     public static BoardFragment newInstance(String param1, String param2) {

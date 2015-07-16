@@ -1,27 +1,34 @@
 package com.example.nozery.diveapp;
 
 import android.app.Activity;
+import android.app.Fragment;
 import android.net.Uri;
 import android.os.Bundle;
-import android.app.Fragment;
-import android.app.ActionBar;
 import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
+import android.view.ViewGroup;
 
+import com.google.android.gms.maps.CameraUpdate;
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.MapFragment;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
 
 /**
  * A simple {@link Fragment} subclass.
  * Activities that contain this fragment must implement the
- * {@link MapFragment.OnMapInteractionListener} interface
+ * {@link DiveMapFragment.OnMapInteractionListener} interface
  * to handle interaction events.
- * Use the {@link MapFragment#newInstance} factory method to
+ * Use the {@link DiveMapFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class MapFragment extends Fragment {
+public class DiveMapFragment extends MapFragment
+		implements OnMapReadyCallback {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
@@ -39,19 +46,20 @@ public class MapFragment extends Fragment {
      *
      * @param param1 Parameter 1.
      * @param param2 Parameter 2.
-     * @return A new instance of fragment MapFragment.
+     * @return A new instance of fragment DiveMapFragment.
      */
     // TODO: Rename and change types and number of parameters
-    public static MapFragment newInstance(String param1, String param2) {
-        MapFragment fragment = new MapFragment();
+    public static DiveMapFragment newInstance(String param1, String param2) {
+        DiveMapFragment fragment = new DiveMapFragment();
         Bundle args = new Bundle();
         args.putString(ARG_PARAM1, param1);
         args.putString(ARG_PARAM2, param2);
         fragment.setArguments(args);
+
         return fragment;
     }
 
-    public MapFragment() {
+    public DiveMapFragment() {
         // Required empty public constructor
     }
 
@@ -62,20 +70,23 @@ public class MapFragment extends Fragment {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
-
-
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
+
+        final View view = super.onCreateView(inflater, container, savedInstanceState);
+
+        getMapAsync(this);
 
         // Set title bar
-        ((MainActivity) getActivity())
-                .setActionBarTitle("Map");
+         ((MainActivity) getActivity())
+                 .setActionBarTitle("Map");
+
         setHasOptionsMenu(true);
-        return inflater.inflate(R.layout.fragment_map, container, false);
+
+        return (view) ;
     }
 
     // TODO: Rename method, update argument and hook method into UI event
@@ -100,6 +111,18 @@ public class MapFragment extends Fragment {
     public void onDetach() {
         super.onDetach();
         mListener = null;
+    }
+
+    @Override
+    public void onMapReady(GoogleMap googleMap) {
+
+        LatLng coordinate = new LatLng(29.513514, 34.926509) ;
+        googleMap.setMyLocationEnabled(true);
+        CameraUpdate location = CameraUpdateFactory.newLatLngZoom(coordinate, 13) ;
+        googleMap.animateCamera(location);
+        googleMap.addMarker(new MarkerOptions()
+                .position(new LatLng(29.513514, 34.926509))
+                .title("Eilat"));
     }
 
     /**

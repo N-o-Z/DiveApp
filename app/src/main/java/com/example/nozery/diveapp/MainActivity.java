@@ -28,7 +28,7 @@ import java.util.Calendar;
 import java.util.List;
 
 public class MainActivity extends ActionBarActivity implements
-        MapFragment.OnMapInteractionListener, BoardFragment.OnBoardInteractionListener,
+        DiveMapFragment.OnMapInteractionListener, BoardFragment.OnBoardInteractionListener,
         SearchFragment.OnSearchInteractionListener, ProfileFragment.OnProfileInteractionListener,
         DatePickerDialog.OnDateSetListener {
 
@@ -41,7 +41,7 @@ public class MainActivity extends ActionBarActivity implements
     private Button mProfileButton;
 
     //Fragments members
-    private MapFragment mMapFragment;
+    private DiveMapFragment mDiveMapFragment;
     private BoardFragment mBoardFragment;
     private SearchFragment mSearchFragment;
     private ProfileFragment mProfileFragment;
@@ -153,21 +153,21 @@ public class MainActivity extends ActionBarActivity implements
         initializeData();
 
         //TODO: Decide on fragment input
-        //final MapFragment
-        mMapFragment = MapFragment.newInstance("a","b");
+        //final DiveMapFragment
+        mDiveMapFragment = DiveMapFragment.newInstance("a", "b");
         mBoardFragment = BoardFragment.newInstance("a","b");
         mSearchFragment = SearchFragment.newInstance("a","b");
         mProfileFragment = ProfileFragment.newInstance(mWorkingProfile.getData());
 
         //TODO: consider implementation
-        switchToFragment(mMapFragment, FragmentsEnum.MAP);
+        switchToFragment(mDiveMapFragment, FragmentsEnum.MAP);
 
         //Initializing buttons and listeners
         mMapButton = (Button) findViewById(R.id.btn_main_map);
         mMapButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                switchToFragment(mMapFragment, FragmentsEnum.MAP);
+                switchToFragment(mDiveMapFragment, FragmentsEnum.MAP);
             }
         });
         mBoardButton = (Button) findViewById(R.id.btn_main_board);
