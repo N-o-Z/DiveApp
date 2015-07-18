@@ -1,19 +1,26 @@
 package com.example.nozery.diveapp;
 
-import android.animation.Animator;
-import android.animation.AnimatorListenerAdapter;
-import android.animation.AnimatorSet;
-import android.animation.ObjectAnimator;
+
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
+import android.content.ComponentName;
+import android.content.ContentResolver;
+import android.content.Context;
 import android.content.DialogInterface;
-import android.graphics.Point;
-import android.graphics.Rect;
+import android.content.Intent;
+import android.content.pm.ResolveInfo;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.Bundle;
 import android.app.Fragment;
 import android.app.DialogFragment;
+import android.os.Environment;
+import android.provider.MediaStore;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -21,20 +28,25 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.DecelerateInterpolator;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
+import android.widget.ArrayAdapter;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.io.File;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -46,52 +58,70 @@ import java.util.HashMap;
  */
 public class ProfileFragment extends Fragment {
 
-    private static final String ARG_PARAM1 = "username";
-    private static final String ARG_PARAM2 = "email";
-    private static final String ARG_PARAM3 = "name";
-    private static final String ARG_PARAM4 = "gender";
-    private static final String ARG_PARAM5 = "birthday";
-    private static final String ARG_PARAM6 = "language";
-    private static final String ARG_PARAM7 = "location";
-
-    // TODO: Rename and change types of parameters
+    //Local user profile member
     protected static UserProfile mProfile;
 
-    protected Dialog mMultiDialog;
-
+    //UI members
     private TextView mUsernameTextView;
     private TextView mEmailTextView;
     protected static TextView mNameTextView;
     protected static TextView mGenderTextView;
-
     protected static TextView mBirthdayTextView;
     protected static TextView mLanguageTextView;
-    protected static View mGenderDialog;
-    protected static View mNameDialog;
     protected static TextView mCountryTextView;
     protected static TextView mCertificationTextView;
     protected static TextView mOrganizationTextView;
     protected static TextView mAdditionalCertTextView;
     protected static ImageView mProfilePicImageView;
     protected static ImageView mExpandedImageView;
-    private OnProfileInteractionListener mListener;
+    protected static LinearLayout mExpandedImageContainer;
+    protected static ImageView mChangePictureView;
+    protected static ImageView mRevertPictureView;
+    protected static ImageView mTakePictureView;
+    private static OnProfileInteractionListener mListener;
+
+    //Camera members
+    protected static Uri imageUri;
+    private static final int PICK_FROM_CAMERA = 1;
+    private static final int CROP_FROM_CAMERA = 2;
+    private static final int PICK_FROM_GALLERY = 3;
 
 
+    public class CropOption {
+        public CharSequence title;
+        public Drawable icon;
+        public Intent appIntent;
+    }
 
+    public class CropOptionAdapter extends ArrayAdapter<CropOption> {
+        private ArrayList<CropOption> mOptions;
+        private LayoutInflater mInflater;
 
-    // Hold a reference to the current animator,
-    // so that it can be canceled mid-way.
-    private Animator mCurrentAnimator;
+        public CropOptionAdapter(Context context, ArrayList<CropOption> options) {
+            super(context, R.layout.crop_layout, options);
 
-    // The system "short" animation time duration, in milliseconds. This
-    // duration is ideal for subtle animations or animations that occur
-    // very frequently.
-    private int mShortAnimationDuration;
+            mOptions = options;
 
-    float mStartScaleFinal;
-    final Rect startBounds = new Rect();
-    final Rect finalBounds = new Rect();
+            mInflater = LayoutInflater.from(context);
+        }
 
+        @Override
+        public View getView(int position, View convertView, ViewGroup group) {
+            if (convertView == null)
+                convertView = mInflater.inflate(R.layout.crop_layout, null);
+
+            CropOption item = mOptions.get(position);
+
+            if (item != null) {
+                ((ImageView) convertView.findViewById(R.id.iv_icon)).setImageDrawable(item.icon);
+                ((TextView) convertView.findViewById(R.id.tv_name)).setText(item.title);
+
+                return convertView;
+            }
+
+            return null;
+        }
+    }
 
     /**
      * Use this factory method to create a new instance of
@@ -100,13 +130,11 @@ public class ProfileFragment extends Fragment {
      * @param data Parameter 1.
      * @return A new instance of fragment ProfileFragment.
      */
-    // TODO: Rename and change types and number of parameters
-    //TODO: put image
     public static ProfileFragment newInstance(HashMap<String, String> data) {
 
         ProfileFragment fragment = new ProfileFragment();
         Bundle args = new Bundle();
-        args.putSerializable("data",data);
+        args.putSerializable("data", data);
         fragment.setArguments(args);
         return fragment;
     }
@@ -120,13 +148,11 @@ public class ProfileFragment extends Fragment {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
 
-            HashMap<String, String> data = (HashMap<String, String>)getArguments()
-                                                                .getSerializable("data");
+            HashMap<String, String> data = (HashMap<String, String>) getArguments()
+                    .getSerializable("data");
             mProfile = new UserProfile(data);
 
         }
-
-        mMultiDialog = new Dialog(getActivity());
 
     }
 
@@ -137,11 +163,6 @@ public class ProfileFragment extends Fragment {
         ((MainActivity) getActivity())
                 .setActionBarTitle("Profile");
         final View view = inflater.inflate(R.layout.fragment_profile, container, false);
-        final View nameView = inflater.inflate(R.layout.name_dialog, container, false);
-        final View genderView = inflater.inflate(R.layout.gender_dialog, container, false);
-
-        mGenderDialog = genderView;
-        //mNameDialog = nameView;
 
         mUsernameTextView = (TextView) view.findViewById(R.id.account_username_text);
         mEmailTextView = (TextView) view.findViewById(R.id.account_email_text);
@@ -155,98 +176,156 @@ public class ProfileFragment extends Fragment {
         mAdditionalCertTextView = (TextView) view.findViewById(R.id.profile_additional_cert_text);
         mProfilePicImageView = (ImageView) view.findViewById(R.id.profile_picture);
         mExpandedImageView = (ImageView) view.findViewById(R.id.expanded_image);
-
-
-
-
-        mProfilePicImageView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                zoomImageFromThumb(mProfilePicImageView, R.drawable.profile);
-            }
-        });
-
-        // Upon clicking the zoomed-in image, it should zoom back down
-        // to the original bounds and show the thumbnail instead of
-        // the expanded image.
-        mExpandedImageView.setOnClickListener(new ImageView.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (mCurrentAnimator != null) {
-                    mCurrentAnimator.cancel();
-                }
-                final RelativeLayout image_container = (RelativeLayout) getActivity()
-                        .findViewById(R.id.expanded_image_container);
-                // Animate the four positioning/sizing properties in parallel,
-                // back to their original values.
-                AnimatorSet set = new AnimatorSet();
-                set.play(ObjectAnimator
-                        .ofFloat(image_container, View.X, startBounds.left))
-                        .with(ObjectAnimator
-                                .ofFloat(image_container,
-                                        View.Y,startBounds.top))
-                        .with(ObjectAnimator
-                                .ofFloat(image_container,
-                                        View.SCALE_X, mStartScaleFinal))
-                        .with(ObjectAnimator
-                                .ofFloat(image_container,
-                                        View.SCALE_Y, mStartScaleFinal));
-                set.setDuration(mShortAnimationDuration);
-                set.setInterpolator(new DecelerateInterpolator());
-                set.addListener(new AnimatorListenerAdapter() {
-                    @Override
-                    public void onAnimationEnd(Animator animation) {
-                        mProfilePicImageView.setAlpha(1f);
-
-                        //profileScrollView.setVisibility(View.VISIBLE);
-                        image_container.setVisibility(View.GONE);
-
-                        //expandedImageView.setVisibility(View.GONE);
-                        mCurrentAnimator = null;
-                    }
-
-                    @Override
-                    public void onAnimationCancel(Animator animation) {
-                        mProfilePicImageView.setAlpha(1f);
-
-                        //profileScrollView.setVisibility(View.VISIBLE);
-                        image_container.setVisibility(View.GONE);
-
-                        //expandedImageView.setVisibility(View.GONE);
-                        mCurrentAnimator = null;
-                    }
-                });
-                set.start();
-                mCurrentAnimator = set;
-            }
-        });
-
-        // Retrieve and cache the system's default "short" animation time.
-        mShortAnimationDuration = getResources().getInteger(
-                android.R.integer.config_shortAnimTime);
-
-
-
-
-
-
-
+        mExpandedImageContainer = (LinearLayout) view.findViewById(R.id.expanded_image_container);
+        mChangePictureView = (ImageView) view.findViewById(R.id.profile_add_image);
+        mRevertPictureView = (ImageView) view.findViewById(R.id.profile_revert_image);
+        mTakePictureView = (ImageView) view.findViewById(R.id.profile_open_camera);
 
         populateProfileFields();
 
         setNameDialog();
-        setGenderDialog(mGenderDialog);
+        setGenderDialog();
         setBirthdayDialog();
         setLanguageDialog();
         setCountryDialog();
         setCertificationDialog();
         setOrganizationDialog();
         setAdditionalCertDialog();
+        setImageAnimationAndDialog();
+        setImageButtons();
 
         setHasOptionsMenu(true);
         // Inflate the layout for this fragment
         return view;
     }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        switch (requestCode) {
+            case PICK_FROM_CAMERA: {
+                if (resultCode == Activity.RESULT_OK) {
+                    doCrop();
+                    Uri selectedImage = imageUri;
+                    getActivity().getContentResolver().notifyChange(selectedImage, null);
+                    try {
+
+                        Toast.makeText(getActivity(), selectedImage.toString(),
+                                Toast.LENGTH_LONG).show();
+                    } catch (Exception e) {
+                        Toast.makeText(getActivity(), "Failed to load", Toast.LENGTH_SHORT)
+                                .show();
+                        Log.e("Camera", e.toString());
+                    }
+                }
+                else {
+                    mTakePictureView.setClickable(true);
+                }
+                break;
+            }
+
+            case CROP_FROM_CAMERA: {
+
+                if (null != data) {
+                    if (data.hasExtra("data")) {
+                        Bitmap photo = data.getParcelableExtra("data");
+
+                        mProfile.setValue(MyDbHelper.ProfileEntry.COLUMN_NAME_PROFILE_PIC
+                                , MainActivity.encodeImage(mExpandedImageView.getDrawable()));
+                        mTakePictureView.setClickable(true);
+                        mProfilePicImageView.setImageBitmap(photo);
+                        mExpandedImageView.setImageBitmap(photo);
+                        mProfile.setValue(MyDbHelper.ProfileEntry.COLUMN_NAME_PROFILE_PIC
+                        ,MainActivity.encodeImage(mProfilePicImageView.getDrawable()));
+                    }
+
+                    File f = new File(imageUri.getPath());
+
+                    if (f.exists()) f.delete();
+                }
+                else {
+                    mTakePictureView.setClickable(true);
+                }
+                break;
+            }
+            case PICK_FROM_GALLERY: {
+                if(Activity.RESULT_OK == resultCode){
+                    Uri selectedImage = imageUri;
+                    getActivity().getContentResolver().notifyChange(selectedImage, null);
+                    try {
+
+                        Toast.makeText(getActivity(), selectedImage.toString(),
+                                Toast.LENGTH_LONG).show();
+                    }
+                    catch (Exception e) {
+                        Toast.makeText(getActivity(), "Failed to load", Toast.LENGTH_SHORT)
+                                .show();
+                        Log.e("Gallery", e.toString());
+                        mChangePictureView.setClickable(true);
+
+                    }
+                    imageUri = data.getData();
+                    doCrop();
+                }
+                else {
+                    mChangePictureView.setClickable(true);
+                }
+                break;
+            }
+            default: {
+                mChangePictureView.setClickable(true);
+                break;
+            }
+        }
+
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        try {
+            mListener = (OnProfileInteractionListener) getActivity();
+        } catch (ClassCastException e) {
+            throw new ClassCastException(getActivity().toString()
+                    + " must implement OnFragmentInteractionListener");
+        }
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        if (mListener != null) {
+            mListener.onProfileInteraction(mProfile);
+            mListener = null;
+        }
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        if (mListener != null) {
+            mListener.onProfileInteraction(mProfile);
+            mListener = null;
+        }
+    }
+
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        try {
+            mListener = (OnProfileInteractionListener) activity;
+        } catch (ClassCastException e) {
+            throw new ClassCastException(activity.toString()
+                    + " must implement OnFragmentInteractionListener");
+        }
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        mListener = null;
+    }
+
 
     private void populateProfileFields() {
 
@@ -262,6 +341,200 @@ public class ProfileFragment extends Fragment {
         mAdditionalCertTextView.setText(mProfile.getValue("additionalCert"));
         mProfilePicImageView.setImageDrawable(MainActivity.decodeImage(getResources()
                 , mProfile.getValue("profilePic")));
+    }
+
+    private void setImageButtons() {
+
+        mTakePictureView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mTakePictureView.setClickable(false);
+                takePhoto();
+            }
+        });
+
+        mChangePictureView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mChangePictureView.setClickable(false);
+                selectPhoto();
+            }
+        });
+
+        mRevertPictureView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Drawable default_pic = MainActivity.getDrawable(getResources()
+                        , R.drawable.profile);
+                if(mProfilePicImageView.getDrawable().equals(default_pic)) {
+                    return;
+                }
+                mRevertPictureView.setClickable(false);
+                mProfile.setValue(MyDbHelper.ProfileEntry.COLUMN_NAME_PROFILE_PIC
+                        , MainActivity.encodeImage(default_pic));
+                mProfilePicImageView.setImageDrawable(MainActivity.decodeImage(getResources()
+                        , mProfile.getValue("profilePic")));
+                mExpandedImageView.setImageDrawable(mProfilePicImageView.getDrawable());
+                mRevertPictureView.setClickable(true);
+            }
+        });
+
+    }
+
+    public void selectPhoto() {
+        File photo = new File(Environment.getExternalStorageDirectory(), "Profile_pic.jpg");
+        Intent intent = new Intent();
+        if(19 <= MainActivity.SDK_VERSION) {
+            intent = new Intent(Intent.ACTION_PICK
+                    , android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+
+            /*intent = new Intent(Intent.ACTION_VIEW, Uri.parse(
+                    "content://media/internal/images/media"));*/
+            intent.addFlags(Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION);
+        }
+        else {
+            intent.setAction(Intent.ACTION_GET_CONTENT);
+            intent.setType("image/*");
+            intent.addCategory(Intent.CATEGORY_OPENABLE);
+        }
+
+        /*intent.setAction(Intent.ACTION_GET_CONTENT);
+        intent.putExtra(Intent.EXTRA_LOCAL_ONLY, true);*/
+        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+        intent.putExtra(MediaStore.EXTRA_OUTPUT,
+                imageUri);
+        imageUri = Uri.fromFile(photo);
+        startActivityForResult(Intent.createChooser(intent,"chooser"), PICK_FROM_GALLERY);
+
+    }
+
+    public void takePhoto() {
+        Intent intent = new Intent("android.media.action.IMAGE_CAPTURE");
+        File photo = new File(Environment.getExternalStorageDirectory(), "Profile_pic.jpg");
+        intent.putExtra(MediaStore.EXTRA_OUTPUT,
+                Uri.fromFile(photo));
+        imageUri = Uri.fromFile(photo);
+        startActivityForResult(intent, PICK_FROM_CAMERA);
+    }
+
+    private Bitmap loadImage(String imgPath) {
+        BitmapFactory.Options options;
+        try {
+            options = new BitmapFactory.Options();
+            options.inSampleSize = 4;// 1/4 of origin image size from width and height
+            Bitmap bitmap = BitmapFactory.decodeFile(imgPath, options);
+            return bitmap;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    private void doCrop() {
+        final ArrayList<CropOption> cropOptions = new ArrayList<CropOption>();
+
+        Intent intent = new Intent("com.android.camera.action.CROP");
+        intent.setType("image/*");
+
+        List<ResolveInfo> list = getActivity().getPackageManager().queryIntentActivities(intent, 0);
+
+        int size = list.size();
+
+        if (size == 0) {
+            Toast.makeText(getActivity(), "Can not find image crop app", Toast.LENGTH_SHORT)
+                    .show();
+
+            return;
+        }
+        else {
+            intent.setData(imageUri);
+
+            intent.putExtra("outputX", 200);
+            intent.putExtra("outputY", 200);
+            intent.putExtra("aspectX", 3);
+            intent.putExtra("aspectY", 4);
+            intent.putExtra("scale", true);
+            intent.putExtra("return-data", true);
+
+            if (size == 1) {
+                Intent i = new Intent(intent);
+                ResolveInfo res = list.get(0);
+
+                i.setComponent(new ComponentName(res.activityInfo.packageName
+                        , res.activityInfo.name));
+
+                startActivityForResult(i, CROP_FROM_CAMERA);
+            } else {
+                for (ResolveInfo res : list) {
+                    final CropOption co = new CropOption();
+
+                    co.title = getActivity().getPackageManager()
+                            .getApplicationLabel(res.activityInfo.applicationInfo);
+                    co.icon = getActivity().getPackageManager()
+                            .getApplicationIcon(res.activityInfo.applicationInfo);
+                    co.appIntent = new Intent(intent);
+
+                    co.appIntent.setComponent(
+                            new ComponentName(res.activityInfo.packageName, res.activityInfo.name));
+
+                    cropOptions.add(co);
+                }
+
+                CropOptionAdapter adapter = new CropOptionAdapter(
+                        getActivity().getApplicationContext(), cropOptions);
+
+                AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                builder.setTitle("Choose Crop App");
+                builder.setAdapter(adapter, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int item) {
+                        startActivityForResult(cropOptions.get(item).appIntent, CROP_FROM_CAMERA);
+                    }
+                });
+
+                builder.setOnCancelListener(new DialogInterface.OnCancelListener() {
+                    @Override
+                    public void onCancel(DialogInterface dialog) {
+
+                        if (imageUri != null) {
+                            getActivity().getContentResolver().delete(imageUri, null, null);
+                            imageUri = null;
+                        }
+                    }
+                });
+
+                AlertDialog alert = builder.create();
+
+                alert.show();
+            }
+        }
+    }
+
+    private void setImageAnimationAndDialog() {
+        final Animation animShow = AnimationUtils.loadAnimation(getActivity(), R.anim.scale_up);
+        final Animation animHide = AnimationUtils.loadAnimation(getActivity(), R.anim.scale_down);
+
+        mProfilePicImageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mProfilePicImageView.setClickable(false);
+                mExpandedImageView.setClickable(true);
+                mProfilePicImageView.startAnimation(animHide);
+                mProfilePicImageView.setVisibility(View.INVISIBLE);
+                mExpandedImageContainer.setVisibility(View.VISIBLE);
+                mExpandedImageContainer.startAnimation(animShow);
+            }
+        });
+        mExpandedImageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mProfilePicImageView.setClickable(true);
+                mExpandedImageView.setClickable(false);
+                mProfilePicImageView.startAnimation(animShow);
+                mProfilePicImageView.setVisibility(View.VISIBLE);
+                mExpandedImageContainer.startAnimation(animHide);
+                mExpandedImageContainer.setVisibility(View.INVISIBLE);
+            }
+        });
     }
 
     private void setAdditionalCertDialog() {
@@ -324,38 +597,14 @@ public class ProfileFragment extends Fragment {
         });
     }
 
-    private void setGenderDialog(final View genderView) {
-        final RadioGroup radio = (RadioGroup) genderView.findViewById(R.id.radio_gender);
-        RadioButton button;
-        for(int i=0; i<radio.getChildCount(); i++) {
-            button = (RadioButton) radio.getChildAt(i);
-            if (mGenderTextView.getText().toString().equals(button.getText().toString())) {
-                button.setChecked(true);
-                break;
-            }
-        }
-        radio.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(RadioGroup group, int checkedId) {
-                RadioButton selected = (RadioButton) genderView
-                        .findViewById(radio.getCheckedRadioButtonId());
-                if(!mGenderTextView.getText().toString()
-                        .equals(selected.getText().toString())) {
-                    mProfile.setValue("gender",selected.getText().toString());
-                    mGenderTextView.setText(mProfile.getValue("gender"));
-                }
-                mMultiDialog.dismiss();
-            }
-        });
+    private void setGenderDialog() {
         mGenderTextView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mMultiDialog.setTitle("Gender");
-                mMultiDialog.setContentView(genderView);
-                mMultiDialog.show();
+                DialogFragment newFragment = new GenderPickerFragment();
+                newFragment.show(getFragmentManager(), "genderChange");
             }
         });
-
     }
 
     private void setNameDialog() {
@@ -364,55 +613,9 @@ public class ProfileFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 DialogFragment newFragment = new NameChangeFragment();
-                newFragment.show(getFragmentManager(), "nameChanges");
+                newFragment.show(getFragmentManager(), "nameChange");
             }
         });
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        try {
-        mListener = (OnProfileInteractionListener) getActivity();
-        } catch (ClassCastException e) {
-            throw new ClassCastException(getActivity().toString()
-                    + " must implement OnFragmentInteractionListener");
-        }
-    }
-
-    @Override
-    public void onPause() {
-        super.onPause();
-        if (mListener != null) {
-            mListener.onProfileInteraction(mProfile);
-            mListener = null;
-        }
-    }
-
-    @Override
-    public void onStop() {
-        super.onStop();
-        if (mListener != null) {
-            mListener.onProfileInteraction(mProfile);
-            mListener = null;
-        }
-    }
-
-    @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
-        try {
-            mListener = (OnProfileInteractionListener) activity;
-        } catch (ClassCastException e) {
-            throw new ClassCastException(activity.toString()
-                    + " must implement OnFragmentInteractionListener");
-        }
-    }
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
-        mListener = null;
     }
 
     /**
@@ -431,7 +634,6 @@ public class ProfileFragment extends Fragment {
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        // TODO Auto-generated method stub
         super.onCreateOptionsMenu(menu, inflater);
         inflater.inflate(R.menu.profile_activity_actions, menu);
     }
@@ -455,8 +657,8 @@ public class ProfileFragment extends Fragment {
         public Dialog onCreateDialog(Bundle savedInstanceState) {
 
             final AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(getActivity());
-            final View view = View.inflate(getActivity(),R.layout.name_dialog, null);
-            final EditText input = (EditText)view.findViewById(R.id.edit_name);
+            final View view = View.inflate(getActivity(), R.layout.name_dialog, null);
+            final EditText input = (EditText) view.findViewById(R.id.edit_name);
             final TextView ok = (TextView) view.findViewById(R.id.name_ok);
 
             input.setText(mNameTextView.getText().toString());
@@ -467,7 +669,8 @@ public class ProfileFragment extends Fragment {
                 public void onClick(View v) {
                     mNameTextView.setClickable(true);
                     if (!mNameTextView.getText().toString().equals(input.getText().toString())) {
-                        mProfile.setValue("name", input.getText().toString());
+                        mProfile.setValue(MyDbHelper.ProfileEntry.COLUMN_NAME_NAME
+                                , input.getText().toString());
                         mNameTextView.setText(mProfile.getValue("name"));
                     }
                     mNameTextView.setClickable(true);
@@ -481,7 +684,6 @@ public class ProfileFragment extends Fragment {
                 @Override
                 public boolean onKey(DialogInterface arg0, int keyCode,
                                      KeyEvent event) {
-                    // TODO Auto-generated method stub
                     if (keyCode == KeyEvent.KEYCODE_BACK) {
                         mNameTextView.setClickable(true);
                         mDialog.dismiss();
@@ -492,6 +694,72 @@ public class ProfileFragment extends Fragment {
             Toast.makeText(getActivity(), "Enter name"
                     , Toast.LENGTH_SHORT).show();
             return mDialog;
+        }
+
+        @Override
+        public void onDismiss(DialogInterface dialog) {
+            super.onDismiss(dialog);
+            mNameTextView.setClickable(true);
+        }
+
+    }
+
+    public static class GenderPickerFragment extends DialogFragment {
+
+        protected static AlertDialog mDialog;
+
+        public Dialog onCreateDialog(Bundle savedInstanceState) {
+
+            final AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(getActivity());
+            final View view = View.inflate(getActivity(), R.layout.gender_dialog, null);
+            mGenderTextView.setClickable(false);
+            final RadioGroup radio = (RadioGroup) view.findViewById(R.id.radio_gender);
+            RadioButton button;
+            for (int i = 0; i < radio.getChildCount(); i++) {
+                button = (RadioButton) radio.getChildAt(i);
+                if (mGenderTextView.getText().toString().equals(button.getText().toString())) {
+                    button.setChecked(true);
+                    break;
+                }
+            }
+            radio.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+                @Override
+                public void onCheckedChanged(RadioGroup group, int checkedId) {
+                    RadioButton selected = (RadioButton) view
+                            .findViewById(radio.getCheckedRadioButtonId());
+                    if (!mGenderTextView.getText().toString()
+                            .equals(selected.getText().toString())) {
+                        mProfile.setValue(MyDbHelper.ProfileEntry.COLUMN_NAME_GENDER
+                                , selected.getText().toString());
+                        mGenderTextView.setText(mProfile.getValue("gender"));
+                    }
+                    mGenderTextView.setClickable(true);
+                    mDialog.dismiss();
+                }
+            });
+            dialogBuilder.setView(view);
+            dialogBuilder.setTitle("Gender");
+            mDialog = dialogBuilder.create();
+            mDialog.setOnKeyListener(new Dialog.OnKeyListener() {
+                @Override
+                public boolean onKey(DialogInterface arg0, int keyCode,
+                                     KeyEvent event) {
+                    if (keyCode == KeyEvent.KEYCODE_BACK) {
+                        mGenderTextView.setClickable(true);
+                        mDialog.dismiss();
+                    }
+                    return true;
+                }
+            });
+            Toast.makeText(getActivity(), "Select gender"
+                    , Toast.LENGTH_SHORT).show();
+            return mDialog;
+        }
+
+        @Override
+        public void onDismiss(DialogInterface dialog) {
+            super.onDismiss(dialog);
+            mGenderTextView.setClickable(true);
         }
     }
 
@@ -507,8 +775,8 @@ public class ProfileFragment extends Fragment {
             final AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(getActivity());
             String currentCountry = mCountryTextView.getText().toString();
             mCountryTextView.setClickable(false);
-            for(int i=0; i<mCountryList.length; i++) {
-                if(mCountryList[i].equals(currentCountry)) {
+            for (int i = 0; i < mCountryList.length; i++) {
+                if (mCountryList[i].equals(currentCountry)) {
                     selection = i;
                     break;
                 }
@@ -520,7 +788,8 @@ public class ProfileFragment extends Fragment {
                 public void onClick(DialogInterface dialog, int which) {
                     if (!mCountryList[which].equals(mCountryTextView.getText().toString())) {
                         mCountryTextView.setText(mCountryList[which]);
-                        mProfile.setValue("country", mCountryTextView.getText().toString());
+                        mProfile.setValue(MyDbHelper.ProfileEntry.COLUMN_NAME_COUNTRY
+                                , mCountryTextView.getText().toString());
                     }
                     mCountryTextView.setClickable(true);
                     mDialog.dismiss();
@@ -532,7 +801,6 @@ public class ProfileFragment extends Fragment {
                 @Override
                 public boolean onKey(DialogInterface arg0, int keyCode,
                                      KeyEvent event) {
-                    // TODO Auto-generated method stub
                     if (keyCode == KeyEvent.KEYCODE_BACK) {
                         mCountryTextView.setClickable(true);
                         mDialog.dismiss();
@@ -544,25 +812,31 @@ public class ProfileFragment extends Fragment {
                     , Toast.LENGTH_SHORT).show();
             return mDialog;
         }
+
+        @Override
+        public void onDismiss(DialogInterface dialog) {
+            super.onDismiss(dialog);
+            mCountryTextView.setClickable(true);
+        }
     }
-    
+
     public static class LanguagePickerFragment extends DialogFragment {
 
         String[] mLanguageList;
         protected boolean[] mSelections;
-        protected static int mCheckedCount =0;
+        protected static int mCheckedCount = 0;
         protected static AlertDialog mDialog;
 
         public Dialog onCreateDialog(Bundle savedInstanceState) {
 
             mLanguageList = getResources().getStringArray(R.array.string_array_languages);
-            mSelections =  new boolean[ mLanguageList.length ];
+            mSelections = new boolean[mLanguageList.length];
             final AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(getActivity());
             String[] currentLang = mLanguageTextView.getText().toString().split(", ");
 
-            for(int i=0; i<mLanguageList.length; i++) {
+            for (int i = 0; i < mLanguageList.length; i++) {
                 for (String lang : currentLang) {
-                    if(mLanguageList[i].equals(lang)) {
+                    if (mLanguageList[i].equals(lang)) {
                         mSelections[i] = true;
                         mCheckedCount++;
                     }
@@ -570,7 +844,8 @@ public class ProfileFragment extends Fragment {
             }
             dialogBuilder.setTitle("Language");
             //dialogBuilder.setMultiChoiceItems(mLanguageList, mSelections, this);
-            dialogBuilder.setMultiChoiceItems(mLanguageList, mSelections, new DialogInterface.OnMultiChoiceClickListener() {
+            dialogBuilder.setMultiChoiceItems(mLanguageList, mSelections
+                    , new DialogInterface.OnMultiChoiceClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which, boolean isChecked) {
 
@@ -614,7 +889,8 @@ public class ProfileFragment extends Fragment {
                             }
                             mLanguageTextView
                                     .setText(languages.substring(0, languages.length() - 2));
-                            mProfile.setValue("language", mLanguageTextView.getText().toString());
+                            mProfile.setValue(MyDbHelper.ProfileEntry.COLUMN_NAME_LANGUAGE
+                                    , mLanguageTextView.getText().toString());
                             mLanguageTextView.setClickable(true);
                             dialog.dismiss();
                             break;
@@ -627,7 +903,6 @@ public class ProfileFragment extends Fragment {
                 @Override
                 public boolean onKey(DialogInterface arg0, int keyCode,
                                      KeyEvent event) {
-                    // TODO Auto-generated method stub
                     if (keyCode == KeyEvent.KEYCODE_BACK) {
                         mLanguageTextView.setClickable(true);
                         mDialog.dismiss();
@@ -638,6 +913,12 @@ public class ProfileFragment extends Fragment {
             Toast.makeText(getActivity(), "Select up to 3 languages"
                     , Toast.LENGTH_SHORT).show();
             return mDialog;
+        }
+
+        @Override
+        public void onDismiss(DialogInterface dialog) {
+            super.onDismiss(dialog);
+            mLanguageTextView.setClickable(true);
         }
     }
 
@@ -654,10 +935,10 @@ public class ProfileFragment extends Fragment {
             int year = c.get(Calendar.YEAR);
             int month = c.get(Calendar.MONTH);
             int day = c.get(Calendar.DAY_OF_MONTH);
-            int minYear = year-100;
-            int maxYear = year-10;
+            int minYear = year - 100;
+            int maxYear = year - 10;
 
-            if(!mBirthdayTextView.getText().toString().equals(getString(R.string.not_specified))){
+            if (!mBirthdayTextView.getText().toString().equals(getString(R.string.not_specified))) {
                 year = c.get(Calendar.YEAR);
                 month = c.get(Calendar.MONTH);
                 day = c.get(Calendar.DAY_OF_MONTH);
@@ -665,17 +946,16 @@ public class ProfileFragment extends Fragment {
 
             final DatePickerDialog datePicker;
 
-            if(MainActivity.FragmentsEnum.PROFILE != MainActivity.mWorkingFrag) {
+            if (MainActivity.FragmentsEnum.PROFILE != MainActivity.mWorkingFrag) {
                 datePicker = new
-                        DatePickerDialog(getActivity(),(MainActivity)getActivity()
+                        DatePickerDialog(getActivity(), (MainActivity) getActivity()
                         , year, month, day);
-            }
-            else {
+            } else {
                 datePicker = new
                         DatePickerDialog(getActivity(), this, year, month, day);
             }
 
-            c.set(maxYear, month,day);
+            c.set(maxYear, month, day);
             datePicker.getDatePicker().setMaxDate(c.getTimeInMillis());
             c.set(minYear, month, day);
             datePicker.getDatePicker().setMinDate(c.getTimeInMillis());
@@ -684,7 +964,6 @@ public class ProfileFragment extends Fragment {
                 @Override
                 public boolean onKey(DialogInterface arg0, int keyCode,
                                      KeyEvent event) {
-                    // TODO Auto-generated method stub
                     if (keyCode == KeyEvent.KEYCODE_BACK) {
                         mBirthdayTextView.setClickable(true);
                         datePicker.dismiss();
@@ -696,6 +975,12 @@ public class ProfileFragment extends Fragment {
             return datePicker;
         }
 
+        @Override
+        public void onDismiss(DialogInterface dialog) {
+            super.onDismiss(dialog);
+            mBirthdayTextView.setClickable(true);
+        }
+
         public void onDateSet(DatePicker view, int year, int month, int day) {
             final Calendar c = Calendar.getInstance();
             c.set(year, month, day);
@@ -704,7 +989,8 @@ public class ProfileFragment extends Fragment {
 
             mBirthdayTextView.setClickable(true);
             mBirthdayTextView.setText(myFormat.format(date));
-            mProfile.setValue("birthday", mBirthdayTextView.getText().toString());
+            mProfile.setValue(MyDbHelper.ProfileEntry.COLUMN_NAME_BIRTHDAY
+                    , mBirthdayTextView.getText().toString());
         }
     }
 
@@ -721,8 +1007,8 @@ public class ProfileFragment extends Fragment {
             final AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(getActivity());
             String currentCert = mCertificationTextView.getText().toString();
 
-            for(int i=0; i< mCertificationList.length; i++) {
-                if(mCertificationList[i].equals(currentCert)) {
+            for (int i = 0; i < mCertificationList.length; i++) {
+                if (mCertificationList[i].equals(currentCert)) {
                     selection = i;
                 }
             }
@@ -734,20 +1020,19 @@ public class ProfileFragment extends Fragment {
                     if (!mCertificationList[which]
                             .equals(mCertificationTextView.getText().toString())) {
                         mCertificationTextView.setText(mCertificationList[which]);
-                        mProfile.setValue("certification"
+                        mProfile.setValue(MyDbHelper.ProfileEntry.COLUMN_NAME_CERTIFICATION
                                 , mCertificationTextView.getText().toString());
                     }
                     mCertificationTextView.setClickable(true);
                     mDialog.dismiss();
                 }
-            })  ;
+            });
             mDialog = dialogBuilder.create();
             mDialog.setOnKeyListener(new Dialog.OnKeyListener() {
 
                 @Override
                 public boolean onKey(DialogInterface arg0, int keyCode,
                                      KeyEvent event) {
-                    // TODO Auto-generated method stub
                     if (keyCode == KeyEvent.KEYCODE_BACK) {
                         mCertificationTextView.setClickable(true);
                         mDialog.dismiss();
@@ -758,6 +1043,12 @@ public class ProfileFragment extends Fragment {
             Toast.makeText(getActivity(), "Select diver certification"
                     , Toast.LENGTH_SHORT).show();
             return mDialog;
+        }
+
+        @Override
+        public void onDismiss(DialogInterface dialog) {
+            super.onDismiss(dialog);
+            mCertificationTextView.setClickable(true);
         }
     }
 
@@ -774,8 +1065,8 @@ public class ProfileFragment extends Fragment {
             final AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(getActivity());
             String currentOrg = mOrganizationTextView.getText().toString();
 
-            for(int i=0; i< mOrganizationList.length; i++) {
-                if(mOrganizationList[i].equals(currentOrg)) {
+            for (int i = 0; i < mOrganizationList.length; i++) {
+                if (mOrganizationList[i].equals(currentOrg)) {
                     selection = i;
                 }
             }
@@ -787,20 +1078,19 @@ public class ProfileFragment extends Fragment {
                     if (!mOrganizationList[which]
                             .equals(mOrganizationTextView.getText().toString())) {
                         mOrganizationTextView.setText(mOrganizationList[which]);
-                        mProfile.setValue("organization"
+                        mProfile.setValue(MyDbHelper.ProfileEntry.COLUMN_NAME_ORGANIZATION
                                 , mOrganizationTextView.getText().toString());
                     }
                     mOrganizationTextView.setClickable(true);
                     mDialog.dismiss();
                 }
-            })  ;
+            });
             mDialog = dialogBuilder.create();
             mDialog.setOnKeyListener(new Dialog.OnKeyListener() {
 
                 @Override
                 public boolean onKey(DialogInterface arg0, int keyCode,
                                      KeyEvent event) {
-                    // TODO Auto-generated method stub
                     if (keyCode == KeyEvent.KEYCODE_BACK) {
                         mOrganizationTextView.setClickable(true);
                         mDialog.dismiss();
@@ -812,26 +1102,32 @@ public class ProfileFragment extends Fragment {
                     , Toast.LENGTH_SHORT).show();
             return mDialog;
         }
+
+        @Override
+        public void onDismiss(DialogInterface dialog) {
+            super.onDismiss(dialog);
+            mOrganizationTextView.setClickable(true);
+        }
     }
 
     public static class AdditionalCertPickerFragment extends DialogFragment {
 
         String[] mAddCertList;
         protected boolean[] mSelections;
-        protected static int mCheckedCount =0;
+        protected static int mCheckedCount = 0;
         protected static AlertDialog mDialog;
 
         public Dialog onCreateDialog(Bundle savedInstanceState) {
 
             mAdditionalCertTextView.setClickable(false);
             mAddCertList = getResources().getStringArray(R.array.string_array_scuba_add_cert);
-            mSelections =  new boolean[ mAddCertList.length ];
+            mSelections = new boolean[mAddCertList.length];
             final AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(getActivity());
             String[] currentAddCert = mAdditionalCertTextView.getText().toString().split("\n");
 
-            for(int i=0; i<mAddCertList.length; i++) {
-                for (String cert: currentAddCert) {
-                    if(mAddCertList[i].equals(cert)) {
+            for (int i = 0; i < mAddCertList.length; i++) {
+                for (String cert : currentAddCert) {
+                    if (mAddCertList[i].equals(cert)) {
                         mSelections[i] = true;
                         mCheckedCount++;
                     }
@@ -862,7 +1158,7 @@ public class ProfileFragment extends Fragment {
                             // }
                             mAdditionalCertTextView
                                     .setText(addCert.substring(0, addCert.length()));
-                            mProfile.setValue("additionalCert"
+                            mProfile.setValue(MyDbHelper.ProfileEntry.COLUMN_NAME_ADD_CERT
                                     , mAdditionalCertTextView.getText().toString());
                             mAdditionalCertTextView.setClickable(true);
                             dialog.dismiss();
@@ -876,7 +1172,6 @@ public class ProfileFragment extends Fragment {
                 @Override
                 public boolean onKey(DialogInterface arg0, int keyCode,
                                      KeyEvent event) {
-                    // TODO Auto-generated method stub
                     if (keyCode == KeyEvent.KEYCODE_BACK) {
                         mAdditionalCertTextView.setClickable(true);
                         mDialog.dismiss();
@@ -888,108 +1183,12 @@ public class ProfileFragment extends Fragment {
                     , Toast.LENGTH_SHORT).show();
             return mDialog;
         }
-    }
 
-
-
-
-    private void zoomImageFromThumb(final View thumbView, int imageResId) {
-        // If there's an animation in progress, cancel it
-        // immediately and proceed with this one.
-        if (mCurrentAnimator != null) {
-            mCurrentAnimator.cancel();
+        @Override
+        public void onDismiss(DialogInterface dialog) {
+            super.onDismiss(dialog);
+            mAdditionalCertTextView.setClickable(true);
         }
 
-        // Load the high-resolution "zoomed-in" image.
-        final RelativeLayout image_container = (RelativeLayout) getActivity()
-                .findViewById(R.id.expanded_image_container);
-        mExpandedImageView.setImageResource(imageResId);
-
-        // Calculate the starting and ending bounds for the zoomed-in image.
-        // This step involves lots of math. Yay, math.
-
-        final Point globalOffset = new Point();
-
-        // The start bounds are the global visible rectangle of the thumbnail,
-        // and the final bounds are the global visible rectangle of the container
-        // view. Also set the container view's offset as the origin for the
-        // bounds, since that's the origin for the positioning animation
-        // properties (X, Y).
-        thumbView.getGlobalVisibleRect(startBounds);
-        getActivity().findViewById(R.id.expanded_image)
-                .getGlobalVisibleRect(finalBounds, globalOffset);
-        startBounds.offset(-globalOffset.x, -globalOffset.y);
-        finalBounds.offset(-globalOffset.x, -globalOffset.y);
-
-        // Adjust the start bounds to be the same aspect ratio as the final
-        // bounds using the "center crop" technique. This prevents undesirable
-        // stretching during the animation. Also calculate the start scaling
-        // factor (the end scaling factor is always 1.0).
-        float startScale;
-        if ((float) finalBounds.width() / finalBounds.height()
-                > (float) startBounds.width() / startBounds.height()) {
-            // Extend start bounds horizontally
-            startScale = (float) startBounds.height() / finalBounds.height();
-            float startWidth = startScale * finalBounds.width();
-            float deltaWidth = (startWidth - startBounds.width()) / 2;
-            startBounds.left -= deltaWidth;
-            startBounds.right += deltaWidth;
-        } else {
-            // Extend start bounds vertically
-            startScale = (float) startBounds.width() / finalBounds.width();
-            float startHeight = startScale * finalBounds.height();
-            float deltaHeight = (startHeight - startBounds.height()) / 2;
-            startBounds.top -= deltaHeight;
-            startBounds.bottom += deltaHeight;
-        }
-
-        // Hide the thumbnail and show the zoomed-in view. When the animation
-        // begins, it will position the zoomed-in view in the place of the
-        // thumbnail.
-        thumbView.setAlpha(0f);
-
-        //profileScrollView.setVisibility(View.GONE);
-        image_container.setVisibility(View.VISIBLE);
-
-        //expandedImageView.setVisibility(View.VISIBLE);
-
-        // Set the pivot point for SCALE_X and SCALE_Y transformations
-        // to the top-left corner of the zoomed-in view (the default
-        // is the center of the view).
-        image_container.setPivotX(0f);
-        image_container.setPivotY(0f);
-
-        // Construct and run the parallel animation of the four translation and
-        // scale properties (X, Y, SCALE_X, and SCALE_Y).
-        AnimatorSet set = new AnimatorSet();
-        set
-                .play(ObjectAnimator.ofFloat(image_container, View.X,
-                        startBounds.left, finalBounds.left))
-                .with(ObjectAnimator.ofFloat(image_container, View.Y,
-                        startBounds.top, finalBounds.top))
-                .with(ObjectAnimator.ofFloat(image_container, View.SCALE_X,
-                        startScale, 1f)).with(ObjectAnimator.ofFloat(image_container,
-                View.SCALE_Y, startScale, 1f));
-        set.setDuration(mShortAnimationDuration);
-        set.setInterpolator(new DecelerateInterpolator());
-        set.addListener(new AnimatorListenerAdapter() {
-            @Override
-            public void onAnimationEnd(Animator animation) {
-                mCurrentAnimator = null;
-            }
-
-            @Override
-            public void onAnimationCancel(Animator animation) {
-                mCurrentAnimator = null;
-            }
-        });
-        set.start();
-        mCurrentAnimator = set;
-        mStartScaleFinal = startScale;
-
     }
-
-
-
-
 }

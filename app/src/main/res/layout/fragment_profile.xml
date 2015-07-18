@@ -295,17 +295,39 @@
         </LinearLayout>
     </ScrollView>
 
-    <RelativeLayout
-        android:id="@+id/expanded_image_container"
+    <LinearLayout
+        android:id="@+id/expanded_image_container" android:orientation="vertical"
         android:layout_width="match_parent" android:layout_height="match_parent"
-        android:visibility="invisible">
-        <ImageView
-            style="@style/button_text"
-            android:id="@+id/expanded_image"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:padding="50dp"
-            android:src="@drawable/profile" android:layout_centerInParent="true"
-            android:contentDescription="@string/description_zoom_touch_close" />
-    </RelativeLayout>
+        android:padding="25dp" android:visibility="invisible">
+        <RelativeLayout
+            android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:background="@android:color/black">
+            <ImageView
+                android:id="@+id/expanded_image"
+                android:scaleType="fitXY"
+                android:adjustViewBounds="true"
+                android:layout_width="@dimen/profile_picture_big_width"
+                android:layout_height="match_parent"
+                android:paddingBottom="50dp"
+                android:paddingTop="25dp"
+                android:src="@drawable/profile" android:layout_centerInParent="true"
+                android:contentDescription="@string/description_zoom_touch_close" />
+            <RelativeLayout
+                android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true">
+                <com.parse.ParseImageView
+                    android:id="@+id/profile_add_image" android:src="@drawable/ic_action_add"
+                    android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:layout_alignParentLeft="true"/>
+                <com.parse.ParseImageView
+                    android:id="@+id/profile_revert_image" android:src="@drawable/ic_action_revert"
+                    android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:layout_centerInParent="true"/>
+                <com.parse.ParseImageView
+                    android:id="@+id/profile_open_camera" android:src="@drawable/ic_action_camera"
+                    android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"/>
+            </RelativeLayout>
+        </RelativeLayout>
+    </LinearLayout>
 </FrameLayout>
