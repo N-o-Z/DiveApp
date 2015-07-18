@@ -32,6 +32,10 @@ public class MainActivity extends ActionBarActivity implements
         SearchFragment.OnSearchInteractionListener, ProfileFragment.OnProfileInteractionListener,
         DatePickerDialog.OnDateSetListener {
 
+    //Device SDK Version
+    final static int SDK_VERSION = Build.VERSION.SDK_INT;
+
+    //Debug clear app cache flag
     public final boolean CLEAR_APP_CACHE = false;
 
     //UI members
@@ -54,86 +58,6 @@ public class MainActivity extends ActionBarActivity implements
     //Data members
     List<UserProfile> mUserProfiles;
     private UserProfile mWorkingProfile;
-
-    public void setActionBarTitle(String title) {
-        getSupportActionBar().setTitle(title);
-    }
-
-    private void switchToFragment(android.app.Fragment frag, FragmentsEnum newFrag) {
-
-        if(mWorkingFrag == newFrag) {
-            return;
-        }
-
-        if(null != mWorkingFrag) {
-            setSeparatorVisibility(View.INVISIBLE);
-        }
-        mWorkingFrag = newFrag;
-        setSeparatorVisibility(View.VISIBLE);
-
-        mManager.beginTransaction()
-                .replace(R.id.fragment_container, frag)
-                .addToBackStack(null).commit();
-    }
-
-    private void setSeparatorVisibility(int visibility ) {
-        switch(mWorkingFrag) {
-            case MAP:
-                findViewById(R.id.map_separator).setVisibility(visibility);
-                break;
-            case BOARD:
-                findViewById(R.id.board_separator).setVisibility(visibility);
-                break;
-            case SEARCH:
-                findViewById(R.id.search_separator).setVisibility(visibility);
-                break;
-            case PROFILE:
-                findViewById(R.id.profile_separator).setVisibility(visibility);
-                break;
-        }
-    }
-
-    private void getWorkingProfile() {
-
-        //WA Currently providing first element
-        //TODO: this is for future multi profile support (consider implementation)
-        mWorkingProfile = mUserProfiles.get(0);
-
-    }
-
-    private void getUserProfiles() {
-        mUserProfiles = mAppDbHelper.getUserProfiles();
-        if(1 > mUserProfiles.size()) {
-            //WA create default profile
-            //TODO: Handle - Not supposed to happen (it should be populated on registration)
-            //TODO: Maybe send to registration page??
-            UserProfile profile = new UserProfile();
-            Drawable pPicture;
-            final int version = Build.VERSION.SDK_INT;
-            if (version >= 21) {
-                pPicture = getResources().getDrawable(R.drawable.profile,null);
-            } else {
-                pPicture = getResources().getDrawable(R.drawable.profile);
-            }
-
-            profile.setValue("username", "TestingUsername");
-            profile.setValue("profilePic", encodeImage(pPicture));
-            mAppDbHelper.createProfile(profile);
-      //      mUserProfiles.add(profile);
-        }
-      //  else {
-            mUserProfiles = mAppDbHelper.getUserProfiles();
-      //  }
-        getWorkingProfile();
-    }
-
-    //Initialize data from app DB
-    private void initializeData() {
-
-        getUserProfiles();
-        //Get more data
-
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -231,6 +155,82 @@ public class MainActivity extends ActionBarActivity implements
         return super.onOptionsItemSelected(item);
     }
 
+
+    public void setActionBarTitle(String title) {
+        getSupportActionBar().setTitle(title);
+    }
+
+    private void switchToFragment(android.app.Fragment frag, FragmentsEnum newFrag) {
+
+        if(mWorkingFrag == newFrag) {
+            return;
+        }
+
+        if(null != mWorkingFrag) {
+            setSeparatorVisibility(View.INVISIBLE);
+        }
+        mWorkingFrag = newFrag;
+        setSeparatorVisibility(View.VISIBLE);
+
+        mManager.beginTransaction()
+                .replace(R.id.fragment_container, frag)
+                .addToBackStack(null).commit();
+    }
+
+    private void setSeparatorVisibility(int visibility ) {
+        switch(mWorkingFrag) {
+            case MAP:
+                findViewById(R.id.map_separator).setVisibility(visibility);
+                break;
+            case BOARD:
+                findViewById(R.id.board_separator).setVisibility(visibility);
+                break;
+            case SEARCH:
+                findViewById(R.id.search_separator).setVisibility(visibility);
+                break;
+            case PROFILE:
+                findViewById(R.id.profile_separator).setVisibility(visibility);
+                break;
+        }
+    }
+
+    private void getWorkingProfile() {
+
+        //WA Currently providing first element
+        //TODO: this is for future multi profile support (consider implementation)
+        mWorkingProfile = mUserProfiles.get(0);
+
+    }
+
+    private void getUserProfiles() {
+        mUserProfiles = mAppDbHelper.getUserProfiles();
+        if(1 > mUserProfiles.size()) {
+            //WA create default profile
+            //TODO: Handle - Not supposed to happen (it should be populated on registration)
+            //TODO: Maybe send to registration page??
+            UserProfile profile = new UserProfile();
+            Drawable pPicture;
+            pPicture = getDrawable(getResources(), R.drawable.profile);
+
+            profile.setValue("username", "TestingUsername");
+            profile.setValue("profilePic", encodeImage(pPicture));
+            mAppDbHelper.createProfile(profile);
+            //      mUserProfiles.add(profile);
+        }
+        //  else {
+        mUserProfiles = mAppDbHelper.getUserProfiles();
+        //  }
+        getWorkingProfile();
+    }
+
+    //Initialize data from app DB
+    private void initializeData() {
+
+        getUserProfiles();
+        //Get more data
+
+    }
+
     @Override
     public void onMapInteraction(Uri uri) {
 
@@ -264,6 +264,13 @@ public class MainActivity extends ActionBarActivity implements
         MAP, BOARD, SEARCH, PROFILE
     }
 
+    protected static Drawable getDrawable(Resources r, int id) {
+        if (SDK_VERSION >= 21) {
+            return r.getDrawable(id, null);
+        } else {
+            return r.getDrawable(id);
+        }
+    }
 
     protected static String encodeImage(Drawable image) {
 
