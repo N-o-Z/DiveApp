@@ -50,6 +50,4 @@
     <string name="hello_search_fragment">Hello search fragment</string>
     <string name="hello_profile_fragment">Hello profile fragment</string>
 
-    <!-- API APP KEY-->
-    <string name="google_maps_key" translatable="false" templateMergeStrategy="preserve">AIzaSyD16uan7ZzIexqvKtz-WpHM3QugeBGszyw</string>
 </resources>

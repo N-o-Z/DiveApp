@@ -1,5 +1,6 @@
 package com.example.nozery.diveapp;
 
+import android.annotation.TargetApi;
 import android.app.DatePickerDialog;
 import android.app.FragmentManager;
 import android.content.pm.ApplicationInfo;
@@ -24,6 +25,7 @@ import com.parse.Parse;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
@@ -53,6 +55,8 @@ public class MainActivity extends ActionBarActivity implements
 
     //Data members
     List<UserProfile> mUserProfiles;
+    ArrayList<DivePoi> mDivepois;
+
     private UserProfile mWorkingProfile;
 
     public void setActionBarTitle(String title) {
@@ -101,6 +105,7 @@ public class MainActivity extends ActionBarActivity implements
 
     }
 
+    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     private void getUserProfiles() {
         mUserProfiles = mAppDbHelper.getUserProfiles();
         if(1 > mUserProfiles.size()) {
@@ -127,12 +132,22 @@ public class MainActivity extends ActionBarActivity implements
         getWorkingProfile();
     }
 
+    private void getPois() {
+
+        mDivepois = mAppDbHelper.getDivePois();
+    }
+
+
     //Initialize data from app DB
     private void initializeData() {
+
+        // TODO remove this test after parse is ready
+        mAppDbHelper.createTestPoi();
 
         getUserProfiles();
         //Get more data
 
+        getPois();
     }
 
     @Override
@@ -154,7 +169,7 @@ public class MainActivity extends ActionBarActivity implements
 
         //TODO: Decide on fragment input
         //final DiveMapFragment
-        mDiveMapFragment = DiveMapFragment.newInstance("a", "b");
+        mDiveMapFragment = DiveMapFragment.newInstance(mDivepois);
         mBoardFragment = BoardFragment.newInstance("a","b");
         mSearchFragment = SearchFragment.newInstance("a","b");
         mProfileFragment = ProfileFragment.newInstance(mWorkingProfile.getData());
