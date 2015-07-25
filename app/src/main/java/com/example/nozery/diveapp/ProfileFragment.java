@@ -40,6 +40,8 @@ import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.parse.ParseUser;
+
 import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;

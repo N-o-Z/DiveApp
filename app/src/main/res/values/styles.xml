@@ -86,4 +86,10 @@
         <item name="android:inputType">text</item>
         <item name="android:digits">abcdefghijklmnopqrstuvwxyz ABCDEFGHIJKLMNOPQRSTUVWXYZ</item>
     </style>
+    <style name="edit_username">
+        <item name="android:maxLength">20</item>
+        <item name="android:inputType">text</item>
+        <item name="android:digits">
+            1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_-.</item>
+    </style>
 </resources>

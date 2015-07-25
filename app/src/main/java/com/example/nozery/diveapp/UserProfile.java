@@ -4,6 +4,11 @@ import java.util.HashMap;
 
 public class UserProfile {
 
+    public static final int MIN_USERNAME_LENGTH = 4;
+    public static final int MAX_USERNAME_LENGTH = 16;
+    public static final int MIN_PASSWORD_LENGTH = 6;
+    public static final int MAX_PASSWORD_LENGTH = 30;
+
     protected HashMap<String, String> mData;
 
     protected UserProfile() {
@@ -11,14 +16,15 @@ public class UserProfile {
         mData = new HashMap<>();
         mData.put("username","USERNAME");
         mData.put("email","EMAIL@PROVIDER.COM");
-        mData.put("name","John Doe");
+        mData.put("name","Not Specified");
         mData.put("gender","Not Specified");
         mData.put("birthday","Not Specified");
         mData.put("language","English");
         mData.put("country","Not Specified");
         mData.put("certification","Not Specified");
         mData.put("organization","Not Specified");
-        mData.put("additionalCert","Not Specified");
+        mData.put("additionalCert", "Not Specified");
+        mData.put("sessionToken","Not Specified");
 
     }
 

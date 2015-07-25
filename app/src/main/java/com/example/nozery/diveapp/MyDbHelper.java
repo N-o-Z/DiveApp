@@ -8,6 +8,9 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.provider.BaseColumns;
 import android.util.Log;
 
+import com.parse.Parse;
+import com.parse.ParseUser;
+
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -21,6 +24,9 @@ import java.util.Locale;
 
 public class MyDbHelper extends SQLiteOpenHelper {
 
+    private ParseUser mCurrentUser;
+    private Context mContext;
+
     // Logcat tag
     private static final String LOG = "MyDbHelper";
 
@@ -31,13 +37,13 @@ public class MyDbHelper extends SQLiteOpenHelper {
     private static final String DATABASE_NAME = "appData";
 
     // Table Names
-    private static final String TABLE_USER_PROFILES = "user_profile";
-    private static final String TABLE_BOARD_PROFILES = "board_profiles";
-    private static final String TABLE_BOARD_MSG = "board_msg";
+    protected static final String TABLE_USER_PROFILES = "user_profile";
+    protected static final String TABLE_BOARD_PROFILES = "board_profiles";
+    protected static final String TABLE_BOARD_MSG = "board_msg";
 
     // Common column names
-    private static final String KEY_ID = "id";
-    private static final String KEY_CREATED_AT = "created_at";
+    protected static final String KEY_ID = "id";
+    protected static final String KEY_CREATED_AT = "created_at";
 
     // Table Create Statements
     // User profile table create statement
@@ -82,17 +88,21 @@ public class MyDbHelper extends SQLiteOpenHelper {
         public static final String COLUMN_NAME_ORGANIZATION = "organization";
         public static final String COLUMN_NAME_ADD_CERT = "additionalCert";
         public static final String COLUMN_NAME_PROFILE_PIC = "profilePic";
+        public static final String COLUMN_NAME_PASSWORD = "password";
 
     }
 
     public MyDbHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
+
     }
+
     public void onCreate(SQLiteDatabase db) {
         // creating required tables
-        db.execSQL(CREATE_TABLE_USER_PROFILE);
+        //db.execSQL(CREATE_TABLE_USER_PROFILE);
         //db.execSQL(CREATE_TABLE_BOARD_PROFILE);
         //db.execSQL(CREATE_TABLE_BOARD_MSG);
+
     }
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         // on upgrade drop older tables
@@ -112,34 +122,38 @@ public class MyDbHelper extends SQLiteOpenHelper {
     /**
      * getting all user profiles
      * */
-    public List<UserProfile> getUserProfiles() {
-        List<UserProfile> profiles = new ArrayList<>();
-        String selectQuery = "SELECT  * FROM " + TABLE_USER_PROFILES;
+    public boolean init() {
+        mCurrentUser = ParseUser.getCurrentUser();
+        return null != mCurrentUser;
+    }
 
-        Log.e(LOG, selectQuery);
+    public UserProfile getCurrentProfile() {
+        mCurrentUser = ParseUser.getCurrentUser();
+        UserProfile profile = new UserProfile();
+        profile.setValue(ProfileEntry.COLUMN_NAME_USERNAME
+                , mCurrentUser.getString(ProfileEntry.COLUMN_NAME_USERNAME));
+        profile.setValue(ProfileEntry.COLUMN_NAME_EMAIL
+                , mCurrentUser.getString(ProfileEntry.COLUMN_NAME_EMAIL));
+        profile.setValue(ProfileEntry.COLUMN_NAME_NAME
+                , mCurrentUser.getString(ProfileEntry.COLUMN_NAME_NAME));
+        profile.setValue(ProfileEntry.COLUMN_NAME_GENDER
+                , mCurrentUser.getString(ProfileEntry.COLUMN_NAME_GENDER));
+        profile.setValue(ProfileEntry.COLUMN_NAME_BIRTHDAY
+                , mCurrentUser.getString(ProfileEntry.COLUMN_NAME_BIRTHDAY));
+        profile.setValue(ProfileEntry.COLUMN_NAME_LANGUAGE
+                , mCurrentUser.getString(ProfileEntry.COLUMN_NAME_LANGUAGE));
+        profile.setValue(ProfileEntry.COLUMN_NAME_COUNTRY
+                , mCurrentUser.getString(ProfileEntry.COLUMN_NAME_COUNTRY));
+        profile.setValue(ProfileEntry.COLUMN_NAME_CERTIFICATION
+                , mCurrentUser.getString(ProfileEntry.COLUMN_NAME_CERTIFICATION));
+        profile.setValue(ProfileEntry.COLUMN_NAME_ORGANIZATION
+                , mCurrentUser.getString(ProfileEntry.COLUMN_NAME_ORGANIZATION));
+        profile.setValue(ProfileEntry.COLUMN_NAME_ADD_CERT
+                , mCurrentUser.getString(ProfileEntry.COLUMN_NAME_ADD_CERT));
+        profile.setValue(ProfileEntry.COLUMN_NAME_PROFILE_PIC
+                , mCurrentUser.getString(ProfileEntry.COLUMN_NAME_PROFILE_PIC));
 
-        SQLiteDatabase db = this.getReadableDatabase();
-        Cursor c = db.rawQuery(selectQuery, null);
-
-        // looping through all rows and adding to list
-        if (c.moveToFirst()) {
-            do {
-                UserProfile profile = new UserProfile();
-                for(int i=0; i<c.getColumnCount(); i++) {
-                    String colName = c.getColumnName(i);
-                    if(colName.equals(KEY_CREATED_AT)) {
-                        continue;
-                    }
-                    profile.setValue(colName,c.getString(i));
-                }
-                String picStr = profile.getValue(ProfileEntry.COLUMN_NAME_PROFILE_PIC);
-                picStr = picStr.replaceAll("''","'");
-                profile.setValue(ProfileEntry.COLUMN_NAME_PROFILE_PIC,picStr);
-                // adding to profiles list
-                profiles.add(profile);
-            } while (c.moveToNext());
-        }
-        return profiles;
+        return profile;
     }
 
     /*
@@ -185,15 +199,37 @@ public class MyDbHelper extends SQLiteOpenHelper {
     /*
     * Updating profile
     */
-    public int updateProfile(UserProfile profile) {
+    public void updateProfile(UserProfile profile) {
 
+        mCurrentUser.put(ProfileEntry.COLUMN_NAME_NAME
+                ,profile.getValue(ProfileEntry.COLUMN_NAME_NAME));
+        mCurrentUser.put(ProfileEntry.COLUMN_NAME_GENDER
+                ,profile.getValue(ProfileEntry.COLUMN_NAME_GENDER));
+        mCurrentUser.put(ProfileEntry.COLUMN_NAME_BIRTHDAY
+                ,profile.getValue(ProfileEntry.COLUMN_NAME_BIRTHDAY));
+        mCurrentUser.put(ProfileEntry.COLUMN_NAME_LANGUAGE
+                ,profile.getValue(ProfileEntry.COLUMN_NAME_LANGUAGE));
+        mCurrentUser.put(ProfileEntry.COLUMN_NAME_COUNTRY
+                ,profile.getValue(ProfileEntry.COLUMN_NAME_COUNTRY));
+        mCurrentUser.put(ProfileEntry.COLUMN_NAME_CERTIFICATION
+                , profile.getValue(ProfileEntry.COLUMN_NAME_CERTIFICATION));
+        mCurrentUser.put(ProfileEntry.COLUMN_NAME_ORGANIZATION
+                , profile.getValue(ProfileEntry.COLUMN_NAME_ORGANIZATION));
+        mCurrentUser.put(ProfileEntry.COLUMN_NAME_ADD_CERT
+                , profile.getValue(ProfileEntry.COLUMN_NAME_ADD_CERT));
+        //String picStr = profile.getValue(ProfileEntry.COLUMN_NAME_PROFILE_PIC);
+        //picStr = picStr.replaceAll("'", "''");
+        mCurrentUser.put(ProfileEntry.COLUMN_NAME_PROFILE_PIC
+                , profile.getValue(ProfileEntry.COLUMN_NAME_PROFILE_PIC));
+        mCurrentUser.saveInBackground();
+/*
         SQLiteDatabase db = this.getWritableDatabase();
 
         ContentValues values = new ContentValues();
-        /*values.put(ProfileEntry.COLUMN_NAME_USERNAME
+        *//*values.put(ProfileEntry.COLUMN_NAME_USERNAME
                 ,profile.getValue(ProfileEntry.COLUMN_NAME_USERNAME));
         values.put(ProfileEntry.COLUMN_NAME_EMAIL
-                ,profile.getValue(ProfileEntry.COLUMN_NAME_EMAIL));*/
+                ,profile.getValue(ProfileEntry.COLUMN_NAME_EMAIL));*//*
         values.put(ProfileEntry.COLUMN_NAME_NAME
                 ,profile.getValue(ProfileEntry.COLUMN_NAME_NAME));
         values.put(ProfileEntry.COLUMN_NAME_GENDER
@@ -216,13 +252,13 @@ public class MyDbHelper extends SQLiteOpenHelper {
                 , picStr);
         // updating row
         return db.update(TABLE_USER_PROFILES, values, ProfileEntry.COLUMN_NAME_USERNAME + " = ?",
-                new String[] { profile.getValue(ProfileEntry.COLUMN_NAME_USERNAME) });
+                new String[] { profile.getValue(ProfileEntry.COLUMN_NAME_USERNAME) });*/
     }
 
     /**
      * get datetime
      * */
-    private String getDateTime() {
+    protected static String getDateTime() {
         SimpleDateFormat dateFormat = new SimpleDateFormat(
                 "yyyy-MM-dd HH:mm:ss", Locale.getDefault());
         Date date = new Date();
