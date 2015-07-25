@@ -22,13 +22,17 @@ import java.util.Locale;
  * Created by nozery on 7/11/2015.
  */
 
-public class MyDbHelper extends SQLiteOpenHelper {
+public class ParseDbHelper {
+
+    public static final String AUTHTOKEN_TYPE_READ_ONLY = "Read only";
+
+    public static final String AUTHTOKEN_TYPE_FULL_ACCESS = "Full access";
 
     private ParseUser mCurrentUser;
     private Context mContext;
 
     // Logcat tag
-    private static final String LOG = "MyDbHelper";
+    private static final String LOG = "ParseDbHelper";
 
     // Database Version
     private static final int DATABASE_VERSION = 1;
@@ -92,31 +96,25 @@ public class MyDbHelper extends SQLiteOpenHelper {
 
     }
 
-    public MyDbHelper(Context context) {
-        super(context, DATABASE_NAME, null, DATABASE_VERSION);
+    public ParseDbHelper() {
 
     }
 
-    public void onCreate(SQLiteDatabase db) {
+    public void onCreate() {
+
+        //TODO: fetch required data from server (what arguments shoud this function receive?
         // creating required tables
         //db.execSQL(CREATE_TABLE_USER_PROFILE);
         //db.execSQL(CREATE_TABLE_BOARD_PROFILE);
         //db.execSQL(CREATE_TABLE_BOARD_MSG);
 
     }
-    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        // on upgrade drop older tables
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_USER_PROFILES);
-        //db.execSQL("DROP TABLE IF EXISTS " + TABLE_BOARD_PROFILES);
-        //db.execSQL("DROP TABLE IF EXISTS " + TABLE_BOARD_MSG);
-        //...
-        //etc
 
-        // create new tables
-        onCreate(db);
+    public void onUpgrade() {
+        // TODO: how to upgrade with parse?
     }
-    public void onDowngrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        onUpgrade(db, oldVersion, newVersion);
+    public void onDowngrade() {
+        // TODO: how to upgrade with parse?
     }
 
     /**
@@ -157,46 +155,6 @@ public class MyDbHelper extends SQLiteOpenHelper {
     }
 
     /*
-     * Creating profile
-     */
-    public long createProfile(UserProfile profile) {
-        SQLiteDatabase db = this.getWritableDatabase();
-
-        ContentValues values = new ContentValues();
-
-        values.put(ProfileEntry.COLUMN_NAME_USERNAME
-                , profile.getValue(ProfileEntry.COLUMN_NAME_USERNAME));
-        values.put(ProfileEntry.COLUMN_NAME_EMAIL
-                , profile.getValue(ProfileEntry.COLUMN_NAME_EMAIL));
-        values.put(ProfileEntry.COLUMN_NAME_NAME
-                , profile.getValue(ProfileEntry.COLUMN_NAME_NAME));
-        values.put(ProfileEntry.COLUMN_NAME_GENDER
-                , profile.getValue(ProfileEntry.COLUMN_NAME_GENDER));
-        values.put(ProfileEntry.COLUMN_NAME_BIRTHDAY
-                , profile.getValue(ProfileEntry.COLUMN_NAME_BIRTHDAY));
-        values.put(ProfileEntry.COLUMN_NAME_LANGUAGE
-                , profile.getValue(ProfileEntry.COLUMN_NAME_LANGUAGE));
-        values.put(ProfileEntry.COLUMN_NAME_COUNTRY
-                , profile.getValue(ProfileEntry.COLUMN_NAME_COUNTRY));
-        values.put(ProfileEntry.COLUMN_NAME_CERTIFICATION
-                , profile.getValue(ProfileEntry.COLUMN_NAME_CERTIFICATION));
-        values.put(ProfileEntry.COLUMN_NAME_ORGANIZATION
-                , profile.getValue(ProfileEntry.COLUMN_NAME_ORGANIZATION));
-        values.put(ProfileEntry.COLUMN_NAME_ADD_CERT
-                , profile.getValue(ProfileEntry.COLUMN_NAME_ADD_CERT));
-        String picStr = profile.getValue(ProfileEntry.COLUMN_NAME_PROFILE_PIC);
-        picStr = picStr.replaceAll("'", "''");
-        values.put(ProfileEntry.COLUMN_NAME_PROFILE_PIC
-                , picStr);
-        values.put(KEY_CREATED_AT, getDateTime());
-
-        // insert row
-        long profile_id = db.insert(TABLE_USER_PROFILES, null, values);
-
-        return profile_id;
-    }
-
-    /*
     * Updating profile
     */
     public void updateProfile(UserProfile profile) {
@@ -217,42 +175,59 @@ public class MyDbHelper extends SQLiteOpenHelper {
                 , profile.getValue(ProfileEntry.COLUMN_NAME_ORGANIZATION));
         mCurrentUser.put(ProfileEntry.COLUMN_NAME_ADD_CERT
                 , profile.getValue(ProfileEntry.COLUMN_NAME_ADD_CERT));
-        //String picStr = profile.getValue(ProfileEntry.COLUMN_NAME_PROFILE_PIC);
-        //picStr = picStr.replaceAll("'", "''");
         mCurrentUser.put(ProfileEntry.COLUMN_NAME_PROFILE_PIC
                 , profile.getValue(ProfileEntry.COLUMN_NAME_PROFILE_PIC));
         mCurrentUser.saveInBackground();
-/*
-        SQLiteDatabase db = this.getWritableDatabase();
 
-        ContentValues values = new ContentValues();
-        *//*values.put(ProfileEntry.COLUMN_NAME_USERNAME
-                ,profile.getValue(ProfileEntry.COLUMN_NAME_USERNAME));
-        values.put(ProfileEntry.COLUMN_NAME_EMAIL
-                ,profile.getValue(ProfileEntry.COLUMN_NAME_EMAIL));*//*
-        values.put(ProfileEntry.COLUMN_NAME_NAME
-                ,profile.getValue(ProfileEntry.COLUMN_NAME_NAME));
-        values.put(ProfileEntry.COLUMN_NAME_GENDER
-                ,profile.getValue(ProfileEntry.COLUMN_NAME_GENDER));
-        values.put(ProfileEntry.COLUMN_NAME_BIRTHDAY
-                ,profile.getValue(ProfileEntry.COLUMN_NAME_BIRTHDAY));
-        values.put(ProfileEntry.COLUMN_NAME_LANGUAGE
-                ,profile.getValue(ProfileEntry.COLUMN_NAME_LANGUAGE));
-        values.put(ProfileEntry.COLUMN_NAME_COUNTRY
-                ,profile.getValue(ProfileEntry.COLUMN_NAME_COUNTRY));
-        values.put(ProfileEntry.COLUMN_NAME_CERTIFICATION
-                , profile.getValue(ProfileEntry.COLUMN_NAME_CERTIFICATION));
-        values.put(ProfileEntry.COLUMN_NAME_ORGANIZATION
-                , profile.getValue(ProfileEntry.COLUMN_NAME_ORGANIZATION));
-        values.put(ProfileEntry.COLUMN_NAME_ADD_CERT
-                , profile.getValue(ProfileEntry.COLUMN_NAME_ADD_CERT));
-        String picStr = profile.getValue(ProfileEntry.COLUMN_NAME_PROFILE_PIC);
-        picStr = picStr.replaceAll("'", "''");
-        values.put(ProfileEntry.COLUMN_NAME_PROFILE_PIC
-                , picStr);
-        // updating row
-        return db.update(TABLE_USER_PROFILES, values, ProfileEntry.COLUMN_NAME_USERNAME + " = ?",
-                new String[] { profile.getValue(ProfileEntry.COLUMN_NAME_USERNAME) });*/
+    }
+
+    public String userSignUp(String username, String email, String pass, String authType)
+            throws Exception {
+        Log.d(MainActivity.APP_NAME, "userSignUp");
+        ParseUser user = new ParseUser();
+
+
+        UserProfile profile = new UserProfile();
+        profile.setValue(ParseDbHelper.ProfileEntry.COLUMN_NAME_USERNAME, username);
+        profile.setValue(ParseDbHelper.ProfileEntry.COLUMN_NAME_EMAIL, email);
+
+        user.setUsername(profile.getValue(ParseDbHelper.ProfileEntry.COLUMN_NAME_USERNAME));
+        user.setEmail(profile.getValue(ParseDbHelper.ProfileEntry.COLUMN_NAME_EMAIL));
+        user.setPassword(pass);
+        user.put(ParseDbHelper.ProfileEntry.COLUMN_NAME_NAME
+                , profile.getValue(ParseDbHelper.ProfileEntry.COLUMN_NAME_NAME));
+        user.put(ParseDbHelper.ProfileEntry.COLUMN_NAME_GENDER
+                , profile.getValue(ParseDbHelper.ProfileEntry.COLUMN_NAME_GENDER));
+        user.put(ParseDbHelper.ProfileEntry.COLUMN_NAME_BIRTHDAY
+                , profile.getValue(ParseDbHelper.ProfileEntry.COLUMN_NAME_BIRTHDAY));
+        user.put(ParseDbHelper.ProfileEntry.COLUMN_NAME_LANGUAGE
+                , profile.getValue(ParseDbHelper.ProfileEntry.COLUMN_NAME_LANGUAGE));
+        user.put(ParseDbHelper.ProfileEntry.COLUMN_NAME_COUNTRY
+                , profile.getValue(ParseDbHelper.ProfileEntry.COLUMN_NAME_COUNTRY));
+        user.put(ParseDbHelper.ProfileEntry.COLUMN_NAME_CERTIFICATION
+                , profile.getValue(ParseDbHelper.ProfileEntry.COLUMN_NAME_CERTIFICATION));
+        user.put(ParseDbHelper.ProfileEntry.COLUMN_NAME_ORGANIZATION
+                , profile.getValue(ParseDbHelper.ProfileEntry.COLUMN_NAME_ORGANIZATION));
+        user.put(ParseDbHelper.ProfileEntry.COLUMN_NAME_ADD_CERT
+                , profile.getValue(ParseDbHelper.ProfileEntry.COLUMN_NAME_ADD_CERT));
+        user.put(ParseDbHelper.ProfileEntry.COLUMN_NAME_PROFILE_PIC
+                , "");
+        user.put(ParseDbHelper.ProfileEntry.COLUMN_NAME_PASSWORD, pass);
+
+
+        user.signUp();
+
+        return user.getSessionToken();
+    }
+
+    public String userSignIn(String username, String pass, String authType) throws Exception {
+
+        Log.d(MainActivity.APP_NAME, "userSignIn");
+
+        ParseUser user = new ParseUser();
+        ParseUser.logIn(username, pass);
+
+        return user.getSessionToken();
     }
 
     /**

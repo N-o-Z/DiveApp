@@ -137,8 +137,9 @@ public class SignUpActivity extends Activity {
                 String authToken;
                 Bundle data = new Bundle();
                 try {
-                    authToken = AccountGeneral.sServerAuthenticate.userSignUp(username, email
-                            , accountPassword, AccountGeneral.AUTHTOKEN_TYPE_FULL_ACCESS);
+                    authToken = MainActivity.mAppDbHelper.userSignUp(
+                            username, email, accountPassword
+                            , ParseDbHelper.AUTHTOKEN_TYPE_FULL_ACCESS);
 
 
                 } catch (Exception e) {
@@ -154,13 +155,13 @@ public class SignUpActivity extends Activity {
                 setResult(RESULT_CANCELED, intent);
                 if (intent.hasExtra("Error")) {
                     showMessage(intent.getStringExtra("Error"));
+                    showProcessing(false);
                 }
                 else {
 
                     setResult(RESULT_OK, intent);
                     finish();
                 }
-                showProcessing(false);
             }
         }.execute();
     }
@@ -182,8 +183,8 @@ public class SignUpActivity extends Activity {
                 String authToken;
                 Bundle data = new Bundle();
                 try {
-                    authToken = AccountGeneral.sServerAuthenticate.userSignIn(username
-                            , accountPassword, AccountGeneral.AUTHTOKEN_TYPE_FULL_ACCESS);
+                    authToken = MainActivity.mAppDbHelper.userSignIn(username, accountPassword
+                            , ParseDbHelper.AUTHTOKEN_TYPE_FULL_ACCESS);
 
 
                 } catch (Exception e) {
@@ -200,13 +201,13 @@ public class SignUpActivity extends Activity {
                 mPasswordView.setText("");
                 if (intent.hasExtra("Error")) {
                     showMessage(intent.getStringExtra("Error"));
+                    showProcessing(false);
                 }
                 else {
 
                     setResult(RESULT_OK, intent);
                     finish();
                 }
-                showProcessing(false);
             }
         }.execute();
     }

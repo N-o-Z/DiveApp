@@ -1,13 +1,9 @@
 package com.example.nozery.diveapp;
 
-import android.accounts.Account;
 import android.accounts.AccountManager;
-import android.accounts.AccountManagerCallback;
-import android.accounts.AccountManagerFuture;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.FragmentManager;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.ApplicationInfo;
 import android.content.res.Resources;
@@ -25,18 +21,13 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.Toast;
 
-import com.parse.Parse;
-import com.parse.ParseUser;
-
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.util.Calendar;
-import java.util.List;
 
 public class MainActivity extends ActionBarActivity implements
         DiveMapFragment.OnMapInteractionListener, BoardFragment.OnBoardInteractionListener,
@@ -51,7 +42,7 @@ public class MainActivity extends ActionBarActivity implements
     final static int SDK_VERSION = Build.VERSION.SDK_INT;
 
     //Debug clear app cache flag
-    public final boolean CLEAR_APP_CACHE = true;
+    public final boolean CLEAR_APP_CACHE = false;
 
     /* Test account auth
 
@@ -77,7 +68,7 @@ public class MainActivity extends ActionBarActivity implements
     static protected FragmentsEnum mWorkingFrag;
 
     //DB members
-    MyDbHelper mAppDbHelper;
+    protected static ParseDbHelper mAppDbHelper = new ParseDbHelper();
 
     //Data members
     private UserProfile mWorkingProfile;
@@ -91,8 +82,6 @@ public class MainActivity extends ActionBarActivity implements
                 clearApplicationData();
             }
         }
-
-        mAppDbHelper = new MyDbHelper(getApplicationContext());
 
         setContentView(R.layout.activity_main);
 
@@ -233,11 +222,11 @@ public class MainActivity extends ActionBarActivity implements
     private void getUserProfile() {
 
         mWorkingProfile = mAppDbHelper.getCurrentProfile();
-        if("" == mWorkingProfile.getValue(MyDbHelper.ProfileEntry.COLUMN_NAME_PROFILE_PIC)) {
+        if("" == mWorkingProfile.getValue(ParseDbHelper.ProfileEntry.COLUMN_NAME_PROFILE_PIC)) {
             Drawable pPicture;
             pPicture = getDrawable(getResources(), R.drawable.profile);
             mWorkingProfile.setValue(
-                    MyDbHelper.ProfileEntry.COLUMN_NAME_PROFILE_PIC, encodeImage(pPicture));
+                    ParseDbHelper.ProfileEntry.COLUMN_NAME_PROFILE_PIC, encodeImage(pPicture));
             mAppDbHelper.updateProfile(mWorkingProfile);
          }
         /*mUserProfiles = mAppDbHelper.getUserProfiles();
