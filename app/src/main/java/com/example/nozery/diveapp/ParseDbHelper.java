@@ -8,9 +8,14 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.provider.BaseColumns;
 import android.util.Log;
 
+import com.parse.FindCallback;
+import com.parse.GetCallback;
 import com.parse.Parse;
+import com.parse.ParseObject;
+import com.parse.ParseQuery;
 import com.parse.ParseUser;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -18,6 +23,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 
 /**
  * Created by nozery on 7/11/2015.
@@ -148,8 +154,27 @@ public class ParseDbHelper {
      * getting all dive pois
      * */
     public ArrayList<DiveBasePoi> getDivePois() {
-      /*  ArrayList<DiveBasePoi> poisList = new ArrayList<>();
-        String selectQuery = "SELECT  * FROM " + TABLE_DIVE_SITES_POI;
+        final ArrayList<DiveBasePoi> poisList = new ArrayList<>();
+
+        ParseQuery<ParseObject> query = ParseQuery.getQuery(TABLE_DIVE_SITES_POI);
+        query.findInBackground(new FindCallback<ParseObject>() {
+            @Override
+            public void done(List<ParseObject> list, com.parse.ParseException e) {
+                Iterator keys;
+                String key;
+                for(ParseObject object : list) {
+                    DiveSite divePoi = new DiveSite();
+                    keys = object.keySet().iterator();
+                    while(keys.hasNext()) {
+                        key = keys.next().toString();
+                        divePoi.setValue(key, object.getString(key));
+                    }
+                    poisList.add(divePoi);
+                }
+            }
+        });
+
+        /*String selectQuery = "SELECT  * FROM " + TABLE_DIVE_SITES_POI;
 
         Log.e(LOG, selectQuery);
 
@@ -173,7 +198,7 @@ public class ParseDbHelper {
             } while (c.moveToNext());
         }
         return poisList;*/
-        return null;
+        return poisList;
     }
 
     /*
@@ -238,6 +263,14 @@ public class ParseDbHelper {
      * Creating Dive POI table
      */
     public long createDiveSitesPoiTable(ArrayList<DiveSite> divePois) {
+
+       /* ParseObject diveSite = new ParseObject(TABLE_DIVE_SITES_POI);
+        diveSite.put(DiveSitesPoiEntry.COLUMN_NAME_POI_NAME,"testName");
+        diveSite.put(DiveSitesPoiEntry.COLUMN_NAME_DESCRIPTION,"testDesc");
+        diveSite.put(DiveSitesPoiEntry.COLUMN_NAME_LATITUDE,"0.0");
+        diveSite.put(DiveSitesPoiEntry.COLUMN_NAME_LONGITUDE,"0.0");
+        diveSite.saveInBackground();
+*/
     /*    SQLiteDatabase db = this.getWritableDatabase();
 
         ContentValues values = new ContentValues();

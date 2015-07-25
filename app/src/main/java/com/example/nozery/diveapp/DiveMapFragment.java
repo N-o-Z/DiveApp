@@ -146,11 +146,11 @@ public class DiveMapFragment extends MapFragment
 
             DiveBasePoi poi =  poiIterator.next();
 
-            name = poi.getValue(MyDbHelper.DiveSitesPoiEntry.COLUMN_NAME_POI_NAME);
+            name = poi.getValue(ParseDbHelper.DiveSitesPoiEntry.COLUMN_NAME_POI_NAME);
             lat = Double.parseDouble(
-                    poi.getValue(MyDbHelper.DiveSitesPoiEntry.COLUMN_NAME_LATITUDE));
+                    poi.getValue(ParseDbHelper.DiveSitesPoiEntry.COLUMN_NAME_LATITUDE));
             lng = Double.parseDouble(
-                    poi.getValue(MyDbHelper.DiveSitesPoiEntry.COLUMN_NAME_LONGITUDE));
+                    poi.getValue(ParseDbHelper.DiveSitesPoiEntry.COLUMN_NAME_LONGITUDE));
 
             map.addMarker(new MarkerOptions()
                     .position(new LatLng(lat, lng))
