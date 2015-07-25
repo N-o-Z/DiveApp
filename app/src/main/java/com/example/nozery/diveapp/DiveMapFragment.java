@@ -115,7 +115,7 @@ public class DiveMapFragment extends MapFragment
     @Override
     public void onMapReady(GoogleMap googleMap) {
 
-        LatLng coordinate = new LatLng(29.513514, 34.926509) ; //TODO: get current tocation
+        LatLng coordinate = new LatLng(29.513514, 34.926509) ; //TODO: get current location
         googleMap.setMyLocationEnabled(true);
         CameraUpdate location = CameraUpdateFactory.newLatLngZoom(coordinate, 12) ;
         googleMap.animateCamera(location);
@@ -147,8 +147,10 @@ public class DiveMapFragment extends MapFragment
             DiveBasePoi poi =  poiIterator.next();
 
             name = poi.getValue(MyDbHelper.DiveSitesPoiEntry.COLUMN_NAME_POI_NAME);
-            lat = Double.parseDouble(poi.getValue(MyDbHelper.DiveSitesPoiEntry.COLUMN_NAME_LATITUDE));
-            lng = Double.parseDouble(poi.getValue(MyDbHelper.DiveSitesPoiEntry.COLUMN_NAME_LONGITUDE));
+            lat = Double.parseDouble(
+                    poi.getValue(MyDbHelper.DiveSitesPoiEntry.COLUMN_NAME_LATITUDE));
+            lng = Double.parseDouble(
+                    poi.getValue(MyDbHelper.DiveSitesPoiEntry.COLUMN_NAME_LONGITUDE));
 
             map.addMarker(new MarkerOptions()
                     .position(new LatLng(lat, lng))

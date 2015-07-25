@@ -1,5 +1,6 @@
 package com.example.nozery.diveapp;
 
+import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.FragmentManager;
 import android.content.Intent;
@@ -46,7 +47,6 @@ public class MainActivity extends ActionBarActivity implements
     /* Test account auth
 
      */
-    private AccountManager mAccountManager;
     private AlertDialog mAlertDialog;
     private boolean mInvalidate;
     private static final String STATE_DIALOG = "state_dialog";
@@ -70,7 +70,6 @@ public class MainActivity extends ActionBarActivity implements
     protected static ParseDbHelper mAppDbHelper = new ParseDbHelper();
 
     //Data members
-    List<UserProfile> mUserProfiles;
     ArrayList<DiveBasePoi> mDivepois;
 
     private UserProfile mWorkingProfile;
@@ -264,8 +263,6 @@ public class MainActivity extends ActionBarActivity implements
         getUserProfile();
         // TODO remove this test after parse is ready
         mAppDbHelper.createTestPoi();
-
-        getUserProfiles();
         //Get more data
 
         getPois();
