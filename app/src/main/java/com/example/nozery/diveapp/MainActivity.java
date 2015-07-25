@@ -1,6 +1,5 @@
 package com.example.nozery.diveapp;
 
-import android.annotation.TargetApi;
 import android.app.DatePickerDialog;
 import android.app.FragmentManager;
 import android.content.pm.ApplicationInfo;
@@ -59,7 +58,7 @@ public class MainActivity extends ActionBarActivity implements
 
     //Data members
     List<UserProfile> mUserProfiles;
-    ArrayList<DivePoi> mDivepois;
+    ArrayList<DiveBasePoi> mDivepois;
 
     private UserProfile mWorkingProfile;
 

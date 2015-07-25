@@ -38,7 +38,7 @@ public class DiveMapFragment extends MapFragment
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "divePois";
 
-    private ArrayList<DivePoi> mDivePois ;
+    private ArrayList<DiveBasePoi> mDivePois ;
 
     private OnMapInteractionListener mListener;
 
@@ -50,7 +50,7 @@ public class DiveMapFragment extends MapFragment
      * @return A new instance of fragment DiveMapFragment.
      */
     // TODO: Rename and change types and number of parameters
-    public static DiveMapFragment newInstance(ArrayList<DivePoi> divePois) {
+    public static DiveMapFragment newInstance(ArrayList<DiveBasePoi> divePois) {
         DiveMapFragment fragment = new DiveMapFragment();
         Bundle args = new Bundle();
         args.putSerializable(ARG_PARAM1, divePois);
@@ -67,7 +67,7 @@ public class DiveMapFragment extends MapFragment
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            mDivePois = (ArrayList<DivePoi>) getArguments().getSerializable(ARG_PARAM1);
+            mDivePois = (ArrayList<DiveBasePoi>) getArguments().getSerializable(ARG_PARAM1);
         }
     }
 
@@ -132,7 +132,7 @@ public class DiveMapFragment extends MapFragment
             computeDistanceBetween(p1, p2);
     }
 
-    private void PutDivePoiOnMap(ArrayList<DivePoi> divePoi)
+    private void PutDivePoiOnMap(ArrayList<DiveBasePoi> divePoi)
     {
         GoogleMap map = getMap();
 
@@ -141,14 +141,14 @@ public class DiveMapFragment extends MapFragment
 
         String name ;
 
-        Iterator<DivePoi> poiIterator = divePoi.iterator();
+        Iterator<DiveBasePoi> poiIterator = divePoi.iterator();
         while (poiIterator.hasNext()) {
 
-            DivePoi poi =  poiIterator.next();
+            DiveBasePoi poi =  poiIterator.next();
 
-            name = poi.getValue(MyDbHelper.DivePoiEntry.COLUMN_NAME_POI_NAME);
-            lat = Double.parseDouble(poi.getValue(MyDbHelper.DivePoiEntry.COLUMN_NAME_LATITUDE));
-            lng = Double.parseDouble(poi.getValue(MyDbHelper.DivePoiEntry.COLUMN_NAME_LONGITUDE));
+            name = poi.getValue(MyDbHelper.DiveSitesPoiEntry.COLUMN_NAME_POI_NAME);
+            lat = Double.parseDouble(poi.getValue(MyDbHelper.DiveSitesPoiEntry.COLUMN_NAME_LATITUDE));
+            lng = Double.parseDouble(poi.getValue(MyDbHelper.DiveSitesPoiEntry.COLUMN_NAME_LONGITUDE));
 
             map.addMarker(new MarkerOptions()
                     .position(new LatLng(lat, lng))
