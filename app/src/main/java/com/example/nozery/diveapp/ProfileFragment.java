@@ -6,7 +6,6 @@ import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.content.ComponentName;
-import android.content.ContentResolver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -230,12 +229,12 @@ public class ProfileFragment extends Fragment {
                     if (data.hasExtra("data")) {
                         Bitmap photo = data.getParcelableExtra("data");
 
-                        mProfile.setValue(MyDbHelper.ProfileEntry.COLUMN_NAME_PROFILE_PIC
+                        mProfile.setValue(ParseDbHelper.ProfileEntry.COLUMN_NAME_PROFILE_PIC
                                 , MainActivity.encodeImage(mExpandedImageView.getDrawable()));
                         mTakePictureView.setClickable(true);
                         mProfilePicImageView.setImageBitmap(photo);
                         mExpandedImageView.setImageBitmap(photo);
-                        mProfile.setValue(MyDbHelper.ProfileEntry.COLUMN_NAME_PROFILE_PIC
+                        mProfile.setValue(ParseDbHelper.ProfileEntry.COLUMN_NAME_PROFILE_PIC
                         ,MainActivity.encodeImage(mProfilePicImageView.getDrawable()));
                     }
 
@@ -323,7 +322,10 @@ public class ProfileFragment extends Fragment {
     @Override
     public void onDetach() {
         super.onDetach();
-        mListener = null;
+        if (mListener != null) {
+            mListener.onProfileInteraction(mProfile);
+            mListener = null;
+        }
     }
 
 
@@ -339,8 +341,10 @@ public class ProfileFragment extends Fragment {
         mCertificationTextView.setText(mProfile.getValue("certification"));
         mOrganizationTextView.setText(mProfile.getValue("organization"));
         mAdditionalCertTextView.setText(mProfile.getValue("additionalCert"));
-        mProfilePicImageView.setImageDrawable(MainActivity.decodeImage(getResources()
-                , mProfile.getValue("profilePic")));
+        Drawable image = MainActivity.decodeImage(getResources(),mProfile.getValue("profilePic"));
+        Drawable exImage = MainActivity.decodeImage(getResources(),mProfile.getValue("profilePic"));
+        mExpandedImageView.setImageDrawable(exImage);
+        mProfilePicImageView.setImageDrawable(image);
     }
 
     private void setImageButtons() {
@@ -370,7 +374,7 @@ public class ProfileFragment extends Fragment {
                     return;
                 }
                 mRevertPictureView.setClickable(false);
-                mProfile.setValue(MyDbHelper.ProfileEntry.COLUMN_NAME_PROFILE_PIC
+                mProfile.setValue(ParseDbHelper.ProfileEntry.COLUMN_NAME_PROFILE_PIC
                         , MainActivity.encodeImage(default_pic));
                 mProfilePicImageView.setImageDrawable(MainActivity.decodeImage(getResources()
                         , mProfile.getValue("profilePic")));
@@ -669,7 +673,7 @@ public class ProfileFragment extends Fragment {
                 public void onClick(View v) {
                     mNameTextView.setClickable(true);
                     if (!mNameTextView.getText().toString().equals(input.getText().toString())) {
-                        mProfile.setValue(MyDbHelper.ProfileEntry.COLUMN_NAME_NAME
+                        mProfile.setValue(ParseDbHelper.ProfileEntry.COLUMN_NAME_NAME
                                 , input.getText().toString());
                         mNameTextView.setText(mProfile.getValue("name"));
                     }
@@ -729,7 +733,7 @@ public class ProfileFragment extends Fragment {
                             .findViewById(radio.getCheckedRadioButtonId());
                     if (!mGenderTextView.getText().toString()
                             .equals(selected.getText().toString())) {
-                        mProfile.setValue(MyDbHelper.ProfileEntry.COLUMN_NAME_GENDER
+                        mProfile.setValue(ParseDbHelper.ProfileEntry.COLUMN_NAME_GENDER
                                 , selected.getText().toString());
                         mGenderTextView.setText(mProfile.getValue("gender"));
                     }
@@ -788,7 +792,7 @@ public class ProfileFragment extends Fragment {
                 public void onClick(DialogInterface dialog, int which) {
                     if (!mCountryList[which].equals(mCountryTextView.getText().toString())) {
                         mCountryTextView.setText(mCountryList[which]);
-                        mProfile.setValue(MyDbHelper.ProfileEntry.COLUMN_NAME_COUNTRY
+                        mProfile.setValue(ParseDbHelper.ProfileEntry.COLUMN_NAME_COUNTRY
                                 , mCountryTextView.getText().toString());
                     }
                     mCountryTextView.setClickable(true);
@@ -824,7 +828,7 @@ public class ProfileFragment extends Fragment {
 
         String[] mLanguageList;
         protected boolean[] mSelections;
-        protected static int mCheckedCount = 0;
+        protected int mCheckedCount = 0;
         protected static AlertDialog mDialog;
 
         public Dialog onCreateDialog(Bundle savedInstanceState) {
@@ -843,7 +847,6 @@ public class ProfileFragment extends Fragment {
                 }
             }
             dialogBuilder.setTitle("Language");
-            //dialogBuilder.setMultiChoiceItems(mLanguageList, mSelections, this);
             dialogBuilder.setMultiChoiceItems(mLanguageList, mSelections
                     , new DialogInterface.OnMultiChoiceClickListener() {
                 @Override
@@ -889,7 +892,7 @@ public class ProfileFragment extends Fragment {
                             }
                             mLanguageTextView
                                     .setText(languages.substring(0, languages.length() - 2));
-                            mProfile.setValue(MyDbHelper.ProfileEntry.COLUMN_NAME_LANGUAGE
+                            mProfile.setValue(ParseDbHelper.ProfileEntry.COLUMN_NAME_LANGUAGE
                                     , mLanguageTextView.getText().toString());
                             mLanguageTextView.setClickable(true);
                             dialog.dismiss();
@@ -989,7 +992,7 @@ public class ProfileFragment extends Fragment {
 
             mBirthdayTextView.setClickable(true);
             mBirthdayTextView.setText(myFormat.format(date));
-            mProfile.setValue(MyDbHelper.ProfileEntry.COLUMN_NAME_BIRTHDAY
+            mProfile.setValue(ParseDbHelper.ProfileEntry.COLUMN_NAME_BIRTHDAY
                     , mBirthdayTextView.getText().toString());
         }
     }
@@ -1020,7 +1023,7 @@ public class ProfileFragment extends Fragment {
                     if (!mCertificationList[which]
                             .equals(mCertificationTextView.getText().toString())) {
                         mCertificationTextView.setText(mCertificationList[which]);
-                        mProfile.setValue(MyDbHelper.ProfileEntry.COLUMN_NAME_CERTIFICATION
+                        mProfile.setValue(ParseDbHelper.ProfileEntry.COLUMN_NAME_CERTIFICATION
                                 , mCertificationTextView.getText().toString());
                     }
                     mCertificationTextView.setClickable(true);
@@ -1078,7 +1081,7 @@ public class ProfileFragment extends Fragment {
                     if (!mOrganizationList[which]
                             .equals(mOrganizationTextView.getText().toString())) {
                         mOrganizationTextView.setText(mOrganizationList[which]);
-                        mProfile.setValue(MyDbHelper.ProfileEntry.COLUMN_NAME_ORGANIZATION
+                        mProfile.setValue(ParseDbHelper.ProfileEntry.COLUMN_NAME_ORGANIZATION
                                 , mOrganizationTextView.getText().toString());
                     }
                     mOrganizationTextView.setClickable(true);
@@ -1114,7 +1117,7 @@ public class ProfileFragment extends Fragment {
 
         String[] mAddCertList;
         protected boolean[] mSelections;
-        protected static int mCheckedCount = 0;
+        protected int mCheckedCount = 0;
         protected static AlertDialog mDialog;
 
         public Dialog onCreateDialog(Bundle savedInstanceState) {
@@ -1129,7 +1132,6 @@ public class ProfileFragment extends Fragment {
                 for (String cert : currentAddCert) {
                     if (mAddCertList[i].equals(cert)) {
                         mSelections[i] = true;
-                        mCheckedCount++;
                     }
                 }
             }
@@ -1149,16 +1151,17 @@ public class ProfileFragment extends Fragment {
                             String addCert = "";
                             for (int i = 0; i < mSelections.length; i++) {
                                 if (mSelections[i]) {
+                                    mCheckedCount++;
                                     addCert = addCert.concat(mAddCertList[i]);
                                     addCert = addCert.concat("\n");
                                 }
                             }
-                            // if(1 < mAdditionalCertTextView.getText().toString().length()) {
-
-                            // }
+                            if(1 > mCheckedCount) {
+                                addCert = getString(R.string.not_specified);
+                            }
                             mAdditionalCertTextView
                                     .setText(addCert.substring(0, addCert.length()));
-                            mProfile.setValue(MyDbHelper.ProfileEntry.COLUMN_NAME_ADD_CERT
+                            mProfile.setValue(ParseDbHelper.ProfileEntry.COLUMN_NAME_ADD_CERT
                                     , mAdditionalCertTextView.getText().toString());
                             mAdditionalCertTextView.setClickable(true);
                             dialog.dismiss();

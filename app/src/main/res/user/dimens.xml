@@ -9,8 +9,8 @@
     <dimen name="basic_content_margin_vertical">5dp</dimen>
     <dimen name="basic_page_margin_horizontal">10dp</dimen>
     <dimen name="basic_page_margin_vertical">10dp</dimen>
-    <dimen name="profile_picture_small_height">130dp</dimen>
-    <dimen name="profile_picture_small_width">100dp</dimen>
+    <dimen name="profile_picture_small_height">145dp</dimen>
+    <dimen name="profile_picture_small_width">120dp</dimen>
     <dimen name="profile_picture_big_height">400dp</dimen>
     <dimen name="profile_picture_big_width">300dp</dimen>
     <dimen name="default_edit_text_width">50dp</dimen>

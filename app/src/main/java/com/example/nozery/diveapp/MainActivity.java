@@ -2,6 +2,7 @@ package com.example.nozery.diveapp;
 
 import android.app.DatePickerDialog;
 import android.app.FragmentManager;
+import android.content.Intent;
 import android.content.pm.ApplicationInfo;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
@@ -12,6 +13,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
+import android.text.TextUtils;
 import android.util.Base64;
 import android.util.Log;
 import android.view.Menu;
@@ -19,25 +21,36 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.DatePicker;
-
-import com.parse.Parse;
+import android.widget.Toast;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.List;
 
 public class MainActivity extends ActionBarActivity implements
         DiveMapFragment.OnMapInteractionListener, BoardFragment.OnBoardInteractionListener,
         SearchFragment.OnSearchInteractionListener, ProfileFragment.OnProfileInteractionListener,
         DatePickerDialog.OnDateSetListener {
 
+    protected static final String APP_NAME = "DiveApp";
+    private final String TAG = getClass().getSimpleName();
+    private static final int LOGIN_SIGN_UP = 1;
+
     //Device SDK Version
     final static int SDK_VERSION = Build.VERSION.SDK_INT;
 
     //Debug clear app cache flag
     public final boolean CLEAR_APP_CACHE = false;
+
+    /* Test account auth
+
+     */
+    private AccountManager mAccountManager;
+    private AlertDialog mAlertDialog;
+    private boolean mInvalidate;
+    private static final String STATE_DIALOG = "state_dialog";
+    private static final String STATE_INVALIDATE = "state_invalidate";
 
     //UI members
     private Button mMapButton;
@@ -54,7 +67,7 @@ public class MainActivity extends ActionBarActivity implements
     static protected FragmentsEnum mWorkingFrag;
 
     //DB members
-    MyDbHelper mAppDbHelper;
+    protected static ParseDbHelper mAppDbHelper = new ParseDbHelper();
 
     //Data members
     List<UserProfile> mUserProfiles;
@@ -65,19 +78,68 @@ public class MainActivity extends ActionBarActivity implements
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-
         boolean debug = (0 != (getApplicationInfo().flags & ApplicationInfo.FLAG_DEBUGGABLE));
         if(debug) {
             if(CLEAR_APP_CACHE) {
-              clearApplicationData();
+                clearApplicationData();
             }
         }
 
-        mAppDbHelper = new MyDbHelper(getApplicationContext());
+        setContentView(R.layout.activity_main);
 
-        mManager = getFragmentManager();
+
+        if (!mAppDbHelper.init()) {
+            Intent intent = new Intent(this, SignUpActivity.class);
+
+            //Start Log in Activity
+            startActivityForResult(intent,LOGIN_SIGN_UP);
+        }
+        else {
+            initApp();
+        }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.menu_main, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId();
+
+        //noinspection SimplifiableIfStatement
+        if (id == R.id.action_settings) {
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        switch(requestCode) {
+            case LOGIN_SIGN_UP: {
+                if(RESULT_OK == resultCode) {
+                    initApp();
+                }
+                else {
+                    //TODO: block all app logic
+                }
+                break;
+            }
+        }
+    }
+
+    private void initApp() {
         initializeData();
+        mManager = getFragmentManager();
 
         //TODO: Decide on fragment input
         //final DiveMapFragment
@@ -120,45 +182,7 @@ public class MainActivity extends ActionBarActivity implements
                 switchToFragment(mProfileFragment, FragmentsEnum.PROFILE);
             }
         });
-
-        // Enable Local Datastore.
-        //TODO: Need to move this to the app initial activity maybe it's this one?
-        Parse.enableLocalDatastore(this);
-
-        Parse.initialize(this, "gsvpCsYn9FbHDvjiBhOZoZyA5toqS3JM81WhHuIK"
-                , "OHHJXQH4eMTQvik4uvrW80nZxnecayjrKqMMBH4k");
-
-        // Test block for Parse
-        /*
-        ParseObject testObject = new ParseObject("TestObject");
-        testObject.put("foo", "bar");
-        testObject.saveInBackground();
-        */
     }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_main, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
-    }
-
-
     public void setActionBarTitle(String title) {
         getSupportActionBar().setTitle(title);
     }
@@ -197,33 +221,36 @@ public class MainActivity extends ActionBarActivity implements
         }
     }
 
-    private void getWorkingProfile() {
+    private void getUserProfile() {
 
-        //WA Currently providing first element
-        //TODO: this is for future multi profile support (consider implementation)
-        mWorkingProfile = mUserProfiles.get(0);
-
-    }
-
-    private void getUserProfiles() {
-        mUserProfiles = mAppDbHelper.getUserProfiles();
+        mWorkingProfile = mAppDbHelper.getCurrentProfile();
+        if("" == mWorkingProfile.getValue(ParseDbHelper.ProfileEntry.COLUMN_NAME_PROFILE_PIC)) {
+            Drawable pPicture;
+            pPicture = getDrawable(getResources(), R.drawable.profile);
+            mWorkingProfile.setValue(
+                    ParseDbHelper.ProfileEntry.COLUMN_NAME_PROFILE_PIC, encodeImage(pPicture));
+            mAppDbHelper.updateProfile(mWorkingProfile);
+         }
+        /*mUserProfiles = mAppDbHelper.getUserProfiles();
         if(1 > mUserProfiles.size()) {
             //WA create default profile
             //TODO: Handle - Not supposed to happen (it should be populated on registration)
             //TODO: Maybe send to registration page??
+
             UserProfile profile = new UserProfile();
             Drawable pPicture;
             pPicture = getDrawable(getResources(), R.drawable.profile);
-
-            profile.setValue("username", "TestingUsername");
             profile.setValue("profilePic", encodeImage(pPicture));
+            profile.setValue("username", "TestingUsername");
+
             mAppDbHelper.createProfile(profile);
             //      mUserProfiles.add(profile);
         }
         //  else {
         mUserProfiles = mAppDbHelper.getUserProfiles();
         //  }
-        getWorkingProfile();
+        getWorkingProfile();*/
+
     }
 
     private void getPois() {
@@ -234,6 +261,7 @@ public class MainActivity extends ActionBarActivity implements
     //Initialize data from app DB
     private void initializeData() {
 
+        getUserProfile();
         // TODO remove this test after parse is ready
         mAppDbHelper.createTestPoi();
 
@@ -263,7 +291,7 @@ public class MainActivity extends ActionBarActivity implements
     public void onProfileInteraction(UserProfile profile) {
 
         mWorkingProfile = profile;
-        mAppDbHelper.updateProfile(profile);
+        mAppDbHelper.updateProfile(mWorkingProfile);
     }
 
     @Override
@@ -326,5 +354,17 @@ public class MainActivity extends ActionBarActivity implements
         }
 
         return dir.delete();
+    }
+
+    protected void showMessage(final String msg) {
+        if (TextUtils.isEmpty(msg))
+            return;
+
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                Toast.makeText(getBaseContext(), msg, Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 }
