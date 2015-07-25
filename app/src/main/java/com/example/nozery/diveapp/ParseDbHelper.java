@@ -15,6 +15,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 
@@ -39,6 +40,7 @@ public class ParseDbHelper {
 
     // Database Name
     private static final String DATABASE_NAME = "appData";
+    private static final String TABLE_DIVE_SITES_POI = "dive_site_poi";
 
     // Table Names
     protected static final String TABLE_USER_PROFILES = "user_profile";
@@ -64,6 +66,15 @@ public class ParseDbHelper {
             +ProfileEntry.COLUMN_NAME_ORGANIZATION + " TEXT,"
             +ProfileEntry.COLUMN_NAME_ADD_CERT + " TEXT,"
             +ProfileEntry.COLUMN_NAME_PROFILE_PIC + " TEXT,"
+            + KEY_CREATED_AT + " DATETIME" + ")";
+
+    // Dive POI table create statement
+    private static final String CREATE_TABLE_DIVE_SITES_POI = "CREATE TABLE "
+            +DiveSitesPoiEntry.TABLE_NAME  + "("
+            +DiveSitesPoiEntry.COLUMN_NAME_LATITUDE + " TEXT,"
+            +DiveSitesPoiEntry.COLUMN_NAME_LONGITUDE + " TEXT,"
+            +DiveSitesPoiEntry.COLUMN_NAME_POI_NAME + " TEXT,"
+            +DiveSitesPoiEntry.COLUMN_NAME_DESCRIPTION + " TEXT,"
             + KEY_CREATED_AT + " DATETIME" + ")";
 
     // Tag table create statement
@@ -96,6 +107,14 @@ public class ParseDbHelper {
 
     }
 
+    public static abstract class DiveSitesPoiEntry implements BaseColumns {
+        public static final String TABLE_NAME = TABLE_DIVE_SITES_POI;
+        public static final String COLUMN_NAME_LATITUDE = "DsLat";
+        public static final String COLUMN_NAME_LONGITUDE = "DsLng";
+        public static final String COLUMN_NAME_POI_NAME = "DsName";
+        public static final String COLUMN_NAME_DESCRIPTION = "DsDesc";
+    }
+
     public ParseDbHelper() {
 
     }
@@ -123,6 +142,161 @@ public class ParseDbHelper {
     public boolean init() {
         mCurrentUser = ParseUser.getCurrentUser();
         return null != mCurrentUser;
+    }
+
+    /**
+     * getting all dive pois
+     * */
+    public ArrayList<DiveBasePoi> getDivePois() {
+      /*  ArrayList<DiveBasePoi> poisList = new ArrayList<>();
+        String selectQuery = "SELECT  * FROM " + TABLE_DIVE_SITES_POI;
+
+        Log.e(LOG, selectQuery);
+
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor c = db.rawQuery(selectQuery, null);
+
+        // looping through all rows and adding to list
+        if (c.moveToFirst()) {
+            do {
+                DiveSite divePoi = new DiveSite();
+                for(int i=0; i<c.getColumnCount(); i++) {
+                    String colName = c.getColumnName(i);
+                    if(colName.equals(KEY_CREATED_AT)) {
+                        continue;
+                    }
+                    divePoi.setValue(colName,c.getString(i));
+                }
+
+                // adding to poi list
+                poisList.add(divePoi);
+            } while (c.moveToNext());
+        }
+        return poisList;*/
+        return null;
+    }
+
+    /*
+    * This function will add POIs to local DB for testing.
+    * TODO: remove this after parse DB is ready.
+    */
+    public long createTestPoi()
+    {
+        ArrayList<DiveSite> pois = new ArrayList<DiveSite>() ;
+        DiveSite poi = new DiveSite();
+
+        // Adding Dive sites
+        //poi.setValue(DiveSitesPoiEntry.COLUMN_NAME_LATITUDE, "29.539050");
+        //poi.setValue(DiveSitesPoiEntry.COLUMN_NAME_LONGITUDE, "34.945576");
+        //poi.setValue(DiveSitesPoiEntry.COLUMN_NAME_POI_NAME, "Barracuda");
+        //poi.setValue(DiveSitesPoiEntry.COLUMN_NAME_TYPE, "club");
+        //poi.setValue(DiveSitesPoiEntry.COLUMN_NAME_DESCRIPTION, "Barracuda dive club");
+        //pois.add(new DivePoi(poi));
+
+        //poi.setValue(DiveSitesPoiEntry.COLUMN_NAME_LATITUDE, "29.514708");
+        //poi.setValue(DiveSitesPoiEntry.COLUMN_NAME_LONGITUDE, "34.926157");
+        //poi.setValue(DiveSitesPoiEntry.COLUMN_NAME_POI_NAME, "Marina Divers");
+        //poi.setValue(DiveSitesPoiEntry.COLUMN_NAME_TYPE, "club");
+        //poi.setValue(DiveSitesPoiEntry.COLUMN_NAME_DESCRIPTION, "Marina Divers dive club");
+        //pois.add(new DivePoi(poi));
+
+        //poi.setValue(DiveSitesPoiEntry.COLUMN_NAME_LATITUDE, "29.498452");
+        //poi.setValue(DiveSitesPoiEntry.COLUMN_NAME_LONGITUDE, "34.911720");
+        //poi.setValue(DiveSitesPoiEntry.COLUMN_NAME_POI_NAME, "Snuba");
+        //poi.setValue(DiveSitesPoiEntry.COLUMN_NAME_TYPE, "club");
+        //poi.setValue(DiveSitesPoiEntry.COLUMN_NAME_DESCRIPTION, "Snuba dive club");
+        //pois.add(new DivePoi(poi));
+
+        poi.setValue(DiveSitesPoiEntry.COLUMN_NAME_LATITUDE, "29.538644");
+        poi.setValue(DiveSitesPoiEntry.COLUMN_NAME_LONGITUDE, "34.946070 ");
+        poi.setValue(DiveSitesPoiEntry.COLUMN_NAME_POI_NAME, "The Big Canyon");
+        poi.setValue(DiveSitesPoiEntry.COLUMN_NAME_DESCRIPTION, "Big Canyon dive site");
+        pois.add(new DiveSite(poi));
+
+        poi.setValue(DiveSitesPoiEntry.COLUMN_NAME_LATITUDE, "29.514631");
+        poi.setValue(DiveSitesPoiEntry.COLUMN_NAME_LONGITUDE, "34.926656");
+        poi.setValue(DiveSitesPoiEntry.COLUMN_NAME_POI_NAME, "Satil Wreck");
+        poi.setValue(DiveSitesPoiEntry.COLUMN_NAME_DESCRIPTION, "Satil wreck dive site");
+        pois.add(new DiveSite(poi));
+
+        poi.setValue(DiveSitesPoiEntry.COLUMN_NAME_LATITUDE, "29.513088");
+        poi.setValue(DiveSitesPoiEntry.COLUMN_NAME_LONGITUDE, "34.926887");
+        poi.setValue(DiveSitesPoiEntry.COLUMN_NAME_POI_NAME, "Yatush Wreck");
+        poi.setValue(DiveSitesPoiEntry.COLUMN_NAME_DESCRIPTION, "Yatush wreck dive site");
+        pois.add(new DiveSite(poi));
+
+        poi.setValue(DiveSitesPoiEntry.COLUMN_NAME_LATITUDE, "29.497689");
+        poi.setValue(DiveSitesPoiEntry.COLUMN_NAME_LONGITUDE, "34.912096");
+        poi.setValue(DiveSitesPoiEntry.COLUMN_NAME_POI_NAME, "The Caves");
+        poi.setValue(DiveSitesPoiEntry.COLUMN_NAME_DESCRIPTION, " The caves dive site");
+        pois.add(new DiveSite(poi));
+
+        return (createDiveSitesPoiTable(pois));
+    }
+
+    /*
+     * Creating Dive POI table
+     */
+    public long createDiveSitesPoiTable(ArrayList<DiveSite> divePois) {
+    /*    SQLiteDatabase db = this.getWritableDatabase();
+
+        ContentValues values = new ContentValues();
+
+        //TODO: add list to DB table
+
+        Iterator<DiveSite> it = divePois.iterator() ;
+        DiveSite poi;
+
+        while (it.hasNext()) {
+
+            poi = it.next() ;
+
+            values.put(DiveSitesPoiEntry.COLUMN_NAME_LATITUDE
+                    , poi.getValue(DiveSitesPoiEntry.COLUMN_NAME_LATITUDE));
+            values.put(DiveSitesPoiEntry.COLUMN_NAME_LONGITUDE
+                    , poi.getValue(DiveSitesPoiEntry.COLUMN_NAME_LONGITUDE));
+            values.put(DiveSitesPoiEntry.COLUMN_NAME_POI_NAME
+                    , poi.getValue(DiveSitesPoiEntry.COLUMN_NAME_POI_NAME));
+            values.put(DiveSitesPoiEntry.COLUMN_NAME_DESCRIPTION
+                    , poi.getValue(DiveSitesPoiEntry.COLUMN_NAME_DESCRIPTION));
+
+
+            // insert row
+            db.insert(TABLE_DIVE_SITES_POI, null, values);
+            values.clear();
+        }
+*/
+        return (0);
+    }
+
+    /*
+  * Updating Dive Sites POI
+  */
+    public int updateDiveSitesPoiTable(List<DiveSite> divePois) {
+
+        /*SQLiteDatabase db = this.getWritableDatabase();
+
+        ContentValues values = new ContentValues();
+
+        Iterator<DiveSite> it =  divePois.iterator();
+
+        int numOfRowsupdated = 0 ;
+
+        while(it.hasNext())
+        {
+            values.put(DiveSitesPoiEntry.COLUMN_NAME_LATITUDE
+                    , it.next().getValue(DiveSitesPoiEntry.COLUMN_NAME_LATITUDE));
+            values.put(DiveSitesPoiEntry.COLUMN_NAME_LONGITUDE
+                    , it.next().getValue(DiveSitesPoiEntry.COLUMN_NAME_LONGITUDE));
+            values.put(DiveSitesPoiEntry.COLUMN_NAME_DESCRIPTION
+                    , it.next().getValue(DiveSitesPoiEntry.COLUMN_NAME_DESCRIPTION));
+
+            // updating row
+            //db.update(TABLE_DIVE_POI, values, DiveSitesPoiEntry.COLUMN_NAME_USERNAME + " = ?",
+            //        new String[]{it.next().getValue(DiveSitesPoiEntry.COLUMN_NAME_USERNAME)});
+        }*/
+
+        return (0);
     }
 
     public UserProfile getCurrentProfile() {

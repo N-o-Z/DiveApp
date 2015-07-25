@@ -2,6 +2,7 @@
 <resources>
 
     <!-- MAPS API APP KEY-->
-    <string name="google_maps_key" translatable="false" templateMergeStrategy="preserve">AIzaSyD16uan7ZzIexqvKtz-WpHM3QugeBGszyw</string>
+    <string name="google_maps_key" translatable="false" templateMergeStrategy="preserve">
+        AIzaSyD16uan7ZzIexqvKtz-WpHM3QugeBGszyw</string>
 
 </resources>
