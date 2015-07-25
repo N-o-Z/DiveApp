@@ -1,7 +1,5 @@
 package com.example.nozery.diveapp;
 
-import android.accounts.AccountManager;
-import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.FragmentManager;
 import android.content.Intent;
@@ -27,6 +25,7 @@ import android.widget.Toast;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Calendar;
 
 public class MainActivity extends ActionBarActivity implements
@@ -71,6 +70,9 @@ public class MainActivity extends ActionBarActivity implements
     protected static ParseDbHelper mAppDbHelper = new ParseDbHelper();
 
     //Data members
+    List<UserProfile> mUserProfiles;
+    ArrayList<DiveBasePoi> mDivepois;
+
     private UserProfile mWorkingProfile;
 
     @Override
@@ -141,7 +143,7 @@ public class MainActivity extends ActionBarActivity implements
 
         //TODO: Decide on fragment input
         //final DiveMapFragment
-        mDiveMapFragment = DiveMapFragment.newInstance("a", "b");
+        mDiveMapFragment = DiveMapFragment.newInstance(mDivepois);
         mBoardFragment = BoardFragment.newInstance("a","b");
         mSearchFragment = SearchFragment.newInstance("a","b");
         mProfileFragment = ProfileFragment.newInstance(mWorkingProfile.getData());
@@ -251,11 +253,22 @@ public class MainActivity extends ActionBarActivity implements
 
     }
 
+    private void getPois() {
+
+        mDivepois = mAppDbHelper.getDivePois();
+    }
+    
     //Initialize data from app DB
     private void initializeData() {
 
         getUserProfile();
+        // TODO remove this test after parse is ready
+        mAppDbHelper.createTestPoi();
+
+        getUserProfiles();
         //Get more data
+
+        getPois();
 
     }
 

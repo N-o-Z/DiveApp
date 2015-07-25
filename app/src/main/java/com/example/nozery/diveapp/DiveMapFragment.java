@@ -19,6 +19,11 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import java.util.ArrayList;
+import java.util.Iterator;
+
+import static com.google.maps.android.SphericalUtil.computeDistanceBetween;
+
 /**
  * A simple {@link Fragment} subclass.
  * Activities that contain this fragment must implement the
@@ -31,12 +36,9 @@ public class DiveMapFragment extends MapFragment
 		implements OnMapReadyCallback {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
+    private static final String ARG_PARAM1 = "divePois";
 
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
+    private ArrayList<DiveBasePoi> mDivePois ;
 
     private OnMapInteractionListener mListener;
 
@@ -44,16 +46,14 @@ public class DiveMapFragment extends MapFragment
      * Use this factory method to create a new instance of
      * this fragment using the provided parameters.
      *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
+     * @param divePois List of POI to present on the map.
      * @return A new instance of fragment DiveMapFragment.
      */
     // TODO: Rename and change types and number of parameters
-    public static DiveMapFragment newInstance(String param1, String param2) {
+    public static DiveMapFragment newInstance(ArrayList<DiveBasePoi> divePois) {
         DiveMapFragment fragment = new DiveMapFragment();
         Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
+        args.putSerializable(ARG_PARAM1, divePois);
         fragment.setArguments(args);
 
         return fragment;
@@ -67,8 +67,7 @@ public class DiveMapFragment extends MapFragment
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
+            mDivePois = (ArrayList<DiveBasePoi>) getArguments().getSerializable(ARG_PARAM1);
         }
     }
 
@@ -116,13 +115,46 @@ public class DiveMapFragment extends MapFragment
     @Override
     public void onMapReady(GoogleMap googleMap) {
 
-        LatLng coordinate = new LatLng(29.513514, 34.926509) ;
+        LatLng coordinate = new LatLng(29.513514, 34.926509) ; //TODO: get current tocation
         googleMap.setMyLocationEnabled(true);
-        CameraUpdate location = CameraUpdateFactory.newLatLngZoom(coordinate, 13) ;
+        CameraUpdate location = CameraUpdateFactory.newLatLngZoom(coordinate, 12) ;
         googleMap.animateCamera(location);
-        googleMap.addMarker(new MarkerOptions()
-                .position(new LatLng(29.513514, 34.926509))
-                .title("Eilat"));
+
+        PutDivePoiOnMap(mDivePois);
+
+    }
+
+    private void ShowDivePOI(LatLng CurLocation)
+    {
+            LatLng p1 = new LatLng(3, 5) ;
+            LatLng p2 = new LatLng(3, 5) ;
+
+            computeDistanceBetween(p1, p2);
+    }
+
+    private void PutDivePoiOnMap(ArrayList<DiveBasePoi> divePoi)
+    {
+        GoogleMap map = getMap();
+
+        Double lng = 0.0 ;
+        Double lat = 0.0 ;
+
+        String name ;
+
+        Iterator<DiveBasePoi> poiIterator = divePoi.iterator();
+        while (poiIterator.hasNext()) {
+
+            DiveBasePoi poi =  poiIterator.next();
+
+            name = poi.getValue(MyDbHelper.DiveSitesPoiEntry.COLUMN_NAME_POI_NAME);
+            lat = Double.parseDouble(poi.getValue(MyDbHelper.DiveSitesPoiEntry.COLUMN_NAME_LATITUDE));
+            lng = Double.parseDouble(poi.getValue(MyDbHelper.DiveSitesPoiEntry.COLUMN_NAME_LONGITUDE));
+
+            map.addMarker(new MarkerOptions()
+                    .position(new LatLng(lat, lng))
+                    .title(name)
+            );
+        }
     }
 
     /**
@@ -158,5 +190,4 @@ public class DiveMapFragment extends MapFragment
                 return super.onOptionsItemSelected(item);
         }
     }
-
 }

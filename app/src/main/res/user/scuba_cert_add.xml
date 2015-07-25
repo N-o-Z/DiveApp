@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array
+        name="string_array_scuba_add_cert">
+        <item>Nitrox</item>
+        <item>Rescue Diver</item>
+        <item>Deep Diver (40m)</item>
+        <item>Altitude Diver</item>
+        <item>Cave Diver</item>
+        <item>Wreck Diver</item>
+        <item>Group Leader</item>
+        <item>Diver Propulsion Vehicle</item>
+    </string-array>
+</resources>

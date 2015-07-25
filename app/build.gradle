@@ -26,5 +26,5 @@ dependencies {
     compile 'com.parse.bolts:bolts-android:1.+'
     compile fileTree(dir: 'libs', include: 'Parse-*.jar')
     compile 'com.google.android.gms:play-services:7.5.0'
-    compile files('libs/gson-2.3.1.jar')
+    compile 'com.google.maps.android:android-maps-utils:0.3+'
 }

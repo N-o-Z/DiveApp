@@ -1,0 +1,274 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array
+        name="string_array_countries">
+        <item>@string/not_specified</item>
+        <item>Afghanistan</item>
+        <item>Africa</item>
+        <item>Aland Islands</item>
+        <item>Albania</item>
+        <item>Algeria</item>
+        <item>American Samoa</item>
+        <item>Andorra</item>
+        <item>Angola</item>
+        <item>Anguilla</item>
+        <item>Antarctica</item>
+        <item>Antigua &amp; Barbuda</item>
+        <item>Argentina</item>
+        <item>Armenia</item>
+        <item>Aruba</item>
+        <item>Asia</item>
+        <item>Australia</item>
+        <item>Austria</item>
+        <item>Azerbaijan</item>
+        <item>Bahamas, The</item>
+        <item>Bahrain</item>
+        <item>Bangladesh</item>
+        <item>Barbados</item>
+        <item>Belarus</item>
+        <item>Belgium</item>
+        <item>Belize</item>
+        <item>Benin</item>
+        <item>Bermuda</item>
+        <item>Bhutan</item>
+        <item>Bolivia</item>
+        <item>Bonaire, St.Eustat, Saba</item>
+        <item>Bosnia and Herzegovina</item>
+        <item>Botswana</item>
+        <item>Bouvet Island</item>
+        <item>Brazil</item>
+        <item>British Indian Ocean T.</item>
+        <item>British Virgin Islands</item>
+        <item>Brunei Darussalam</item>
+        <item>Bulgaria</item>
+        <item>Burkina Faso</item>
+        <item>Burundi</item>
+        <item>Cabo Verde</item>
+        <item>Cambodia</item>
+        <item>Cameroon</item>
+        <item>Canada</item>
+        <item>Caribbean, the</item>
+        <item>Cayman Islands</item>
+        <item>Central African Republic</item>
+        <item>Central America</item>
+        <item>Chad</item>
+        <item>Chile</item>
+        <item>China</item>
+        <item>Christmas Island</item>
+        <item>Cocos (Keeling) Islands</item>
+        <item>Colombia</item>
+        <item>Comoros</item>
+        <item>Congo</item>
+        <item>Congo, Dem. Rep. of the</item>
+        <item>Cook Islands</item>
+        <item>Costa Rica</item>
+        <item>Cote D\'Ivoire</item>
+        <item>Croatia</item>
+        <item>Cuba</item>
+        <item>Curaçao</item>
+        <item>Cyprus</item>
+        <item>Czech Republic</item>
+        <item>Denmark</item>
+        <item>Djibouti</item>
+        <item>Dominica</item>
+        <item>Dominican Republic</item>
+        <item>East Timor (Timor-Leste)</item>
+        <item>Ecuador</item>
+        <item>Egypt</item>
+        <item>El Salvador</item>
+        <item>Equatorial Guinea</item>
+        <item>Eritrea</item>
+        <item>Estonia</item>
+        <item>Ethiopia</item>
+        <item>Europe</item>
+        <item>European Union</item>
+        <item>Falkland Is. (Malvinas)</item>
+        <item>Faroe Islands</item>
+        <item>Fiji</item>
+        <item>Finland</item>
+        <item>France</item>
+        <item>French Guiana</item>
+        <item>French Polynesia</item>
+        <item>French Southern Terr.</item>
+        <item>Gabon</item>
+        <item>Gambia, the</item>
+        <item>Georgia</item>
+        <item>Germany</item>
+        <item>Ghana</item>
+        <item>Gibraltar</item>
+        <item>Greece</item>
+        <item>Greenland</item>
+        <item>Grenada</item>
+        <item>Guadeloupe</item>
+        <item>Guam</item>
+        <item>Guatemala</item>
+        <item>Guernsey and Alderney</item>
+        <item>Guiana, French</item>
+        <item>Guinea</item>
+        <item>Guinea-Bissau</item>
+        <item>Guinea, Equatorial</item>
+        <item>Guyana</item>
+        <item>Haiti</item>
+        <item>Heard &amp; McDonald Is.</item>
+        <item>Holy See (Vatican)</item>
+        <item>Honduras</item>
+        <item>Hong Kong, (China)</item>
+        <item>Hungary</item>
+        <item>Iceland</item>
+        <item>India</item>
+        <item>Indonesia</item>
+        <item>Iran, Islamic Republic of</item>
+        <item>Iraq</item>
+        <item>Ireland</item>
+        <item>Israel</item>
+        <item>Italy</item>
+        <item>Ivory Coast (Cote d\'Ivoire)</item>
+        <item>Jamaica</item>
+        <item>Japan</item>
+        <item>Jersey</item>
+        <item>Jordan</item>
+        <item>Kazakhstan</item>
+        <item>Kenya</item>
+        <item>Kiribati</item>
+        <item>Korea Dem. People\'s Rep.</item>
+        <item>Korea, (South) Republic of</item>
+        <item>Kosovo</item>
+        <item>Kuwait</item>
+        <item>Kyrgyzstan</item>
+        <item>Lao People\'s Dem. Rep.</item>
+        <item>Latvia</item>
+        <item>Lebanon</item>
+        <item>Lesotho</item>
+        <item>Liberia</item>
+        <item>Libyan Arab Jamahiriya</item>
+        <item>Liechtenstein</item>
+        <item>Lithuania</item>
+        <item>Luxembourg</item>
+        <item>Macao, (China)</item>
+        <item>Macedonia, TFYR</item>
+        <item>Madagascar</item>
+        <item>Malawi</item>
+        <item>Malaysia</item>
+        <item>Maldives</item>
+        <item>Mali</item>
+        <item>Malta</item>
+        <item>Man, Isle of</item>
+        <item>Marshall Islands</item>
+        <item>Martinique (FR)</item>
+        <item>Mauritania</item>
+        <item>Mauritius</item>
+        <item>Mayotte (FR)</item>
+        <item>Mexico</item>
+        <item>Micronesia, Fed. States of</item>
+        <item>Middle East</item>
+        <item>Moldova, Republic of</item>
+        <item>Monaco</item>
+        <item>Mongolia</item>
+        <item>Montenegro</item>
+        <item>Montserrat</item>
+        <item>Morocco</item>
+        <item>Mozambique</item>
+        <item>Myanmar (ex-Burma)</item>
+        <item>Namibia</item>
+        <item>Nauru</item>
+        <item>Nepal</item>
+        <item>Netherlands</item>
+        <item>Netherlands Antilles</item>
+        <item>New Caledonia</item>
+        <item>New Zealand</item>
+        <item>Nicaragua</item>
+        <item>Niger</item>
+        <item>Nigeria</item>
+        <item>Niue</item>
+        <item>Norfolk Island</item>
+        <item>North America</item>
+        <item>Northern Mariana Islands</item>
+        <item>Norway</item>
+        <item>Oceania</item>
+        <item>Oman</item>
+        <item>Pakistan</item>
+        <item>Palau</item>
+        <item>Palestinian Territory</item>
+        <item>Panama</item>
+        <item>Papua New Guinea</item>
+        <item>Paraguay</item>
+        <item>Peru</item>
+        <item>Philippines</item>
+        <item>Pitcairn Island</item>
+        <item>Poland</item>
+        <item>Portugal</item>
+        <item>Puerto Rico</item>
+        <item>Qatar</item>
+        <item>Reunion (FR)</item>
+        <item>Romania</item>
+        <item>Russia (Russian Fed.)</item>
+        <item>Rwanda</item>
+        <item>Sahara, Western</item>
+        <item>Saint Barthelemy (FR)</item>
+        <item>Saint Helena (UK)</item>
+        <item>Saint Kitts and Nevis</item>
+        <item>Saint Lucia</item>
+        <item>Saint Martin (FR)</item>
+        <item>S Pierre &amp; Miquelon(FR)</item>
+        <item>S Vincent &amp; Grenadines</item>
+        <item>Samoa</item>
+        <item>San Marino</item>
+        <item>Sao Tome and Principe</item>
+        <item>Saudi Arabia</item>
+        <item>Senegal</item>
+        <item>Serbia</item>
+        <item>Seychelles</item>
+        <item>Sierra Leone</item>
+        <item>Singapore</item>
+        <item>Slovakia</item>
+        <item>Slovenia</item>
+        <item>Solomon Islands</item>
+        <item>Somalia</item>
+        <item>South Africa</item>
+        <item>South America</item>
+        <item>S.George &amp; S.Sandwich</item>
+        <item>South Sudan</item>
+        <item>Spain</item>
+        <item>Sri Lanka (ex-Ceilan)</item>
+        <item>Sudan</item>
+        <item>Suriname</item>
+        <item>Svalbard &amp; Jan Mayen Is.</item>
+        <item>Swaziland</item>
+        <item>Sweden</item>
+        <item>Switzerland</item>
+        <item>Syrian Arab Republic</item>
+        <item>Taiwan</item>
+        <item>Tajikistan</item>
+        <item>Tanzania, United Rep. of</item>
+        <item>Thailand</item>
+        <item>Timor-Leste (East Timor)</item>
+        <item>Togo</item>
+        <item>Tokelau</item>
+        <item>Tonga</item>
+        <item>Trinidad &amp; Tobago</item>
+        <item>Tunisia</item>
+        <item>Turkey</item>
+        <item>Turkmenistan</item>
+        <item>Turks and Caicos Is.</item>
+        <item>Tuvalu</item>
+        <item>Uganda</item>
+        <item>Ukraine</item>
+        <item>United Arab Emirates</item>
+        <item>United Kingdom</item>
+        <item>United States</item>
+        <item>US Minor Outlying Isl.</item>
+        <item>Uruguay</item>
+        <item>Uzbekistan</item>
+        <item>Vanuatu</item>
+        <item>Vatican (Holy See)</item>
+        <item>Venezuela</item>
+        <item>Viet Nam</item>
+        <item>Virgin Islands, British</item>
+        <item>Virgin Islands, U.S.</item>
+        <item>Wallis and Futuna</item>
+        <item>Western Sahara</item>
+        <item>Yemen</item>
+        <item>Zambia</item>
+        <item>Zimbabwe</item>
+    </string-array>
+</resources>
